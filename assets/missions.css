@@ -83,3 +83,12 @@ body{font-size:16px}
 .card span{color:var(--muted);font-size:.92rem}
 .card .sn{margin-top:auto;padding-top:6px;font-size:.84rem;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+/* sample program and changes */
+.sample-b{border:1px solid var(--line);border-radius:10px;overflow:hidden;min-height:80px;background:var(--panel)}
+.sample-p{max-height:none}
+.changes{margin:0;padding-left:22px;display:grid;gap:10px}
+.changes label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.changes input{margin-top:4px;width:18px;height:18px;accent-color:var(--ok);flex:none}
+.changes b{font-weight:700}
+.changes span{color:var(--ink)}
+.changes small{display:block;color:var(--muted);font-size:.92rem;margin-top:2px}

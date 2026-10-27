@@ -354,14 +354,150 @@ function css(){
 }
 
 /* ---------- attach to one editor ---------- */
-UB.attach=function(cfg){
-  const ta=document.getElementById(cfg.textarea);
-  if(!ta||!window.Blockly||!window.python)return null;
+function define(cfg){
   css();
   if(!G){G=python.pythonGenerator;O=python.Order}
   if(!common){defineCommon(cfg);common=true}
   const spec=buildSpec(cfg.api,cfg.examples);defineApi(spec);
   G.addReservedWords(spec.map(f=>f.n).concat(["sleep","time","median","mean","most_common"]).join(","));
+  return spec;
+}
+/* Blocks without an editor: kit for building block specs, read-only pictures and their Python. */
+UB.kit=function(cfg){if(!window.Blockly||!window.python)return null;const spec=define(cfg);return makeKit(spec,cfg)};
+UB.toPython=function(json){
+  const w=new Blockly.Workspace();Blockly.serialization.blocks.append(JSON.parse(JSON.stringify(json)),w);
+  const c=G.workspaceToCode(w);w.dispose();return c.replace(/^\n+/,"");
+};
+UB.view=function(div,json){
+  const w=Blockly.inject(div,{readOnly:true,renderer:"zelos",theme:theme(),media:BASE+"blockly/media/",zoom:{startScale:0.7},move:{scrollbars:{horizontal:true,vertical:false},drag:true,wheel:false},sounds:false});
+  const b=Blockly.serialization.blocks.append(JSON.parse(JSON.stringify(json)),w);
+  const fit=()=>{const r=b.getHeightWidth();div.style.height=Math.ceil(r.height*w.scale+44)+"px";Blockly.svgResize(w);const xy=b.getRelativeToSurfaceXY();w.scroll(16-xy.x*w.scale,20-xy.y*w.scale)};
+  fit();
+  const retheme=()=>w.setTheme(theme());
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",retheme);
+  new MutationObserver(retheme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+  return w;
+};
+function makeKit(spec,cfg){
+  const tbx=toolbox(spec,cfg),items={};
+  tbx.contents.forEach(c=>(c.contents||[]).forEach(it=>{if(!items[it.type])items[it.type]=it}));
+  function info(type){
+    const f=spec.find(x=>"ub_"+x.n===type);
+    if(f)return{label:human(f.n),colour:COL[f.cat],ok:true};
+    const b=BUILTIN[type];return b?{label:b[0],colour:COL[b[1]],ok:!!Blockly.Blocks[type]}:{label:type,colour:COL.py,ok:false};
+  }
+  /* A flowchart step is a block spec:
+     "ub_tof_distance_cm" | {fn:"ub_servo_to",args:[60]} | {var:"colour"} | 30 | "red"
+     ["LT",a,b] (EQ NEQ LT LTE GT GTE AND OR NOT NONE IN ADD MINUS MULTIPLY DIVIDE)
+     {set:"colour",to:spec} | {repeat:4} | {forever:1} | {until:cond} | {forEach:"angle",list:[..]} | {if:cond,else:true} | {cases:[cond,..]} */
+  const OPS={EQ:"=",NEQ:"≠",LT:"<",LTE:"≤",GT:">",GTE:"≥",AND:"and",OR:"or",ADD:"+",MINUS:"−",MULTIPLY:"×",DIVIDE:"÷"};
+  const isType=v=>typeof v==="string"&&/^(ub_|controls_|logic_|math_|text_|lists_|variables_)/.test(v);
+  function val(v){
+    if(typeof v==="number")return{shadow:{type:"math_number",fields:{NUM:v}}};
+    if(typeof v==="string"&&!isType(v))return{shadow:{type:"text",fields:{TEXT:v}}};
+    return{block:build(v)};
+  }
+  function call(type,args){
+    const j=JSON.parse(JSON.stringify(items[type]||{type}));delete j.kind;j.inputs=j.inputs||{};
+    const f=spec.find(x=>"ub_"+x.n===type);
+    const names={ub_sleep:["S"],ub_median:["LIST"],ub_mean:["LIST"],ub_most_common:["LIST"]}[type];
+    (args||[]).forEach((a,i)=>{const ar=f&&f.args[i];
+      j.inputs[names?names[i]:"A"+i]=ar&&ar.opts&&ar.opts.includes(a)?{shadow:{type:ar.opt_type,fields:{OPT:a}}}:val(a)});
+    return j;
+  }
+  function build(v){
+    if(isType(v))return call(v,[]);
+    if(Array.isArray(v)){const [op,a,b]=v;
+      if(["EQ","NEQ","LT","LTE","GT","GTE"].includes(op))return{type:"logic_compare",fields:{OP:op},inputs:{A:val(a),B:val(b)}};
+      if(op==="AND"||op==="OR")return{type:"logic_operation",fields:{OP:op},inputs:{A:val(a),B:val(b)}};
+      if(op==="NOT")return{type:"logic_negate",inputs:{BOOL:val(a)}};
+      if(op==="NONE")return{type:"ub_isnone",fields:{OP:"IS"},inputs:{A:val(a)}};
+      if(op==="IN")return{type:"ub_in",inputs:{A:val(a),B:val(b)}};
+      if(op==="LIST"){const ins={};v.slice(1).forEach((x,i)=>ins["ADD"+i]=val(x));return{type:"lists_create_with",extraState:{itemCount:v.length-1},inputs:ins}}
+      if(op==="ITEM")return{type:"lists_getIndex",fields:{MODE:"GET",WHERE:"FROM_START"},inputs:{VALUE:val(a),AT:val(b)}};
+      return{type:"math_arithmetic",fields:{OP:op},inputs:{A:val(a),B:val(b)}};
+    }
+    if(v.var)return{type:"variables_get",fields:{VAR:{name:v.var}}};
+    if(v.fn)return call(v.fn,v.args);
+    if(v.set)return{type:"variables_set",fields:{VAR:{name:v.set}},inputs:{VALUE:val(v.to)}};
+    if(v.print!==undefined)return{type:"text_print",inputs:{TEXT:val(v.print)}};
+    if(v.change)return{type:"math_change",fields:{VAR:{name:v.change}},inputs:{DELTA:val(v.by)}};
+    if(v.round!==undefined)return{type:"math_round",fields:{OP:"ROUND"},inputs:{NUM:val(v.round)}};
+    if(v.random)return{type:"math_random_int",inputs:{FROM:val(v.random[0]),TO:val(v.random[1])}};
+    if(v.not!==undefined)return{type:"logic_negate",inputs:{BOOL:val(v.not)}};
+    if(v.len!==undefined)return{type:"lists_length",inputs:{VALUE:val(v.len)}};
+    if(v.join)return{type:"text_join",extraState:{itemCount:v.join.length},inputs:Object.fromEntries(v.join.map((x,i)=>["ADD"+i,val(x)]))};
+    if(v.bool!==undefined)return{type:"logic_boolean",fields:{BOOL:v.bool?"TRUE":"FALSE"}};
+    if(v.flow)return{type:"controls_flow_statements",fields:{FLOW:v.flow}};
+    if(v.repeat)return{type:"controls_repeat_ext",inputs:{TIMES:val(v.repeat)}};
+    if(v.forever)return{type:"ub_forever"};
+    if(v.until)return{type:"controls_whileUntil",fields:{MODE:"UNTIL"},inputs:{BOOL:val(v.until)}};
+    if(v.forEach){const ins={};v.list.forEach((x,i)=>ins["ADD"+i]=val(x));
+      return{type:"controls_forEach",fields:{VAR:{name:v.forEach}},inputs:{LIST:{block:{type:"lists_create_with",extraState:{itemCount:v.list.length},inputs:ins}}}}}
+    if(v.if){const j={type:"controls_if",inputs:{IF0:val(v.if)}};if(v.else)j.extraState={hasElse:true};return j}
+    if(v.cases){const ins={};v.cases.forEach((c,i)=>ins["IF"+i]=val(c));
+      return{type:"controls_if",extraState:{elseIfCount:v.cases.length-1},inputs:ins}}
+    return{type:String(v)};
+  }
+  function label(v){
+    if(typeof v==="number")return String(v);
+    if(typeof v==="string")return isType(v)?info(v).label:"“"+v+"”";
+    if(Array.isArray(v)){const [op,a,b]=v;
+      if(op==="LIST"){const it=v.slice(1).map(label);return it.every(x=>x===it[0])?"list of "+it.length+" × "+it[0]:"["+it.join(", ")+"]"}
+      if(op==="ITEM")return"item "+label(b)+" of "+label(a);
+      if(op==="NOT")return"not "+label(a);if(op==="NONE")return label(a)+" is None";if(op==="IN")return label(a)+" is in "+label(b);
+      const t=label(a)+" "+OPS[op]+" "+label(b);return["ADD","MINUS","MULTIPLY","DIVIDE"].includes(op)?"("+t+")":t}
+    if(v.var)return v.var;
+    if(v.fn==="ub_sleep")return"wait "+label(v.args[0])+" seconds";
+    if(v.fn)return info(v.fn).label+(v.args&&v.args.length?" "+v.args.map(label).join(", "):"");
+    if(v.set)return"set "+v.set+" to "+label(v.to);
+    if(v.print!==undefined)return"print "+label(v.print);
+    if(v.change)return"change "+v.change+" by "+label(v.by);
+    if(v.round!==undefined)return"round "+label(v.round);
+    if(v.random)return"random number "+v.random[0]+" to "+v.random[1];
+    if(v.not!==undefined)return"not "+label(v.not);
+    if(v.len!==undefined)return"length of "+label(v.len);
+    if(v.join)return"join "+v.join.map(label).join(" + ");
+    if(v.bool!==undefined)return v.bool?"true":"false";
+    if(v.flow)return v.flow==="BREAK"?"break out of loop":"continue with next loop";
+    if(v.repeat)return"repeat "+v.repeat+" times";
+    if(v.forever)return"repeat forever";
+    if(v.until)return"repeat until "+label(v.until);
+    if(v.forEach)return"for each "+v.forEach+" in list";
+    if(v.if)return"if "+label(v.if)+(v.else?" … else":"");
+    if(v.cases)return"if … else if ("+v.cases.length+" questions)";
+    return String(v);
+  }
+  function colourOf(v){
+    if(isType(v))return info(v).colour;
+    if(Array.isArray(v)&&(v[0]==="LIST"||v[0]==="ITEM"))return COL.lists;
+    if(Array.isArray(v))return["ADD","MINUS","MULTIPLY","DIVIDE"].includes(v[0])?COL.math:COL.logic;
+    if(v&&v.fn)return info(v.fn).colour;
+    if(v&&(v.var||v.set||v.change))return COL.vars;
+    if(v&&(v.print!==undefined||v.join))return COL.text;
+    if(v&&(v.round!==undefined||v.random))return COL.math;
+    if(v&&(v.not!==undefined||v.bool!==undefined))return COL.logic;
+    if(v&&v.len!==undefined)return COL.lists;
+    if(v&&(v.if||v.cases))return COL.logic;
+    return COL.loops;
+  }
+  function usable(v){const j=JSON.stringify(build(v));return[...j.matchAll(/"type":"([^"]+)"/g)].every(m=>!!Blockly.Blocks[m[1]])}
+  // A whole program from a flowchart: actions, loops and questions in order (sensor steps that only explain are skipped).
+  function program(flow){
+    const chain=list=>{const bs=[];(list||[]).forEach(st=>{const j=node(st);if(j)bs.push(j)});for(let i=0;i<bs.length-1;i++)bs[i].next={block:bs[i+1]};return bs[0]||null};
+    const node=st=>{if(st.sense&&!(st.b&&st.b.set))return null;const j=build(st.b);j.inputs=j.inputs||{};
+      if(st.loop){const c=chain(st.body);if(c)j.inputs.DO={block:c}}
+      if(st.if){const y=chain(st.yes),n=chain(st.no);if(y)j.inputs.DO0={block:y};if(n)j.inputs.ELSE={block:n}}
+      if(st.cases)st.branches.forEach((br,i)=>{const c=chain(br[1]);if(c)j.inputs["DO"+i]={block:c}});
+      return j};
+    return chain(flow);
+  }
+  return{info,build,label,colourOf,usable,items,program,chipInfo:v=>({label:label(v),colour:colourOf(v),ok:usable(v)})};
+}
+UB.attach=function(cfg){
+  const ta=document.getElementById(cfg.textarea);
+  if(!ta||!window.Blockly||!window.python)return null;
+  const spec=define(cfg);
   const specJson=JSON.stringify({api:Object.fromEntries(spec.map(f=>[f.n,{value:f.value,args:f.args.map(a=>({name:a.name,opts:a.opts||null,opt_type:a.opt_type||null}))}])),
     helpers:cfg.helpers?["median","mean","most_common"]:[],sleep:cfg.sleep||"global"});
   const KEY="ugot_code_mode:"+location.pathname.split("/").pop()+":"+cfg.textarea;
@@ -423,88 +559,7 @@ UB.attach=function(cfg){
   bar.addEventListener("click",e=>{const b=e.target.closest("button[data-m]");if(b&&b.dataset.m!==mode)setMode(b.dataset.m)});
   let start=cfg.mode||"python";try{start=localStorage.getItem(KEY)||start}catch(e){}
   if(start==="blocks")setMode("blocks");
-  // Used by flowcharts: name and colour of a block, and adding one to the program.
-  const tbx=toolbox(spec,cfg),items={};
-  tbx.contents.forEach(c=>(c.contents||[]).forEach(it=>{if(!items[it.type])items[it.type]=it}));
-  function info(type){
-    const f=spec.find(x=>"ub_"+x.n===type);
-    if(f)return{label:human(f.n),colour:COL[f.cat],ok:true};
-    const b=BUILTIN[type];return b?{label:b[0],colour:COL[b[1]],ok:!!Blockly.Blocks[type]}:{label:type,colour:COL.py,ok:false};
-  }
-  /* A flowchart step is a block spec:
-     "ub_tof_distance_cm" | {fn:"ub_servo_to",args:[60]} | {var:"colour"} | 30 | "red"
-     ["LT",a,b] (EQ NEQ LT LTE GT GTE AND OR NOT NONE IN ADD MINUS MULTIPLY DIVIDE)
-     {set:"colour",to:spec} | {repeat:4} | {forever:1} | {until:cond} | {forEach:"angle",list:[..]} | {if:cond,else:true} | {cases:[cond,..]} */
-  const OPS={EQ:"=",NEQ:"≠",LT:"<",LTE:"≤",GT:">",GTE:"≥",AND:"and",OR:"or",ADD:"+",MINUS:"−",MULTIPLY:"×",DIVIDE:"÷"};
-  const isType=v=>typeof v==="string"&&/^(ub_|controls_|logic_|math_|text_|lists_|variables_)/.test(v);
-  function val(v){
-    if(typeof v==="number")return{shadow:{type:"math_number",fields:{NUM:v}}};
-    if(typeof v==="string"&&!isType(v))return{shadow:{type:"text",fields:{TEXT:v}}};
-    return{block:build(v)};
-  }
-  function call(type,args){
-    const j=JSON.parse(JSON.stringify(items[type]||{type}));delete j.kind;j.inputs=j.inputs||{};
-    const f=spec.find(x=>"ub_"+x.n===type);
-    const names={ub_sleep:["S"],ub_median:["LIST"],ub_mean:["LIST"],ub_most_common:["LIST"]}[type];
-    (args||[]).forEach((a,i)=>{const ar=f&&f.args[i];
-      j.inputs[names?names[i]:"A"+i]=ar&&ar.opts&&ar.opts.includes(a)?{shadow:{type:ar.opt_type,fields:{OPT:a}}}:val(a)});
-    return j;
-  }
-  function build(v){
-    if(isType(v))return call(v,[]);
-    if(Array.isArray(v)){const [op,a,b]=v;
-      if(["EQ","NEQ","LT","LTE","GT","GTE"].includes(op))return{type:"logic_compare",fields:{OP:op},inputs:{A:val(a),B:val(b)}};
-      if(op==="AND"||op==="OR")return{type:"logic_operation",fields:{OP:op},inputs:{A:val(a),B:val(b)}};
-      if(op==="NOT")return{type:"logic_negate",inputs:{BOOL:val(a)}};
-      if(op==="NONE")return{type:"ub_isnone",fields:{OP:"IS"},inputs:{A:val(a)}};
-      if(op==="IN")return{type:"ub_in",inputs:{A:val(a),B:val(b)}};
-      if(op==="LIST"){const ins={};v.slice(1).forEach((x,i)=>ins["ADD"+i]=val(x));return{type:"lists_create_with",extraState:{itemCount:v.length-1},inputs:ins}}
-      if(op==="ITEM")return{type:"lists_getIndex",fields:{MODE:"GET",WHERE:"FROM_START"},inputs:{VALUE:val(a),AT:val(b)}};
-      return{type:"math_arithmetic",fields:{OP:op},inputs:{A:val(a),B:val(b)}};
-    }
-    if(v.var)return{type:"variables_get",fields:{VAR:{name:v.var}}};
-    if(v.fn)return call(v.fn,v.args);
-    if(v.set)return{type:"variables_set",fields:{VAR:{name:v.set}},inputs:{VALUE:val(v.to)}};
-    if(v.repeat)return{type:"controls_repeat_ext",inputs:{TIMES:val(v.repeat)}};
-    if(v.forever)return{type:"ub_forever"};
-    if(v.until)return{type:"controls_whileUntil",fields:{MODE:"UNTIL"},inputs:{BOOL:val(v.until)}};
-    if(v.forEach){const ins={};v.list.forEach((x,i)=>ins["ADD"+i]=val(x));
-      return{type:"controls_forEach",fields:{VAR:{name:v.forEach}},inputs:{LIST:{block:{type:"lists_create_with",extraState:{itemCount:v.list.length},inputs:ins}}}}}
-    if(v.if){const j={type:"controls_if",inputs:{IF0:val(v.if)}};if(v.else)j.extraState={hasElse:true};return j}
-    if(v.cases){const ins={};v.cases.forEach((c,i)=>ins["IF"+i]=val(c));
-      return{type:"controls_if",extraState:{elseIfCount:v.cases.length-1},inputs:ins}}
-    return{type:String(v)};
-  }
-  function label(v){
-    if(typeof v==="number")return String(v);
-    if(typeof v==="string")return isType(v)?info(v).label:"“"+v+"”";
-    if(Array.isArray(v)){const [op,a,b]=v;
-      if(op==="LIST"){const it=v.slice(1).map(label);return it.every(x=>x===it[0])?"list of "+it.length+" × "+it[0]:"["+it.join(", ")+"]"}
-      if(op==="ITEM")return"item "+label(b)+" of "+label(a);
-      if(op==="NOT")return"not "+label(a);if(op==="NONE")return label(a)+" is None";if(op==="IN")return label(a)+" is in "+label(b);
-      const t=label(a)+" "+OPS[op]+" "+label(b);return["ADD","MINUS","MULTIPLY","DIVIDE"].includes(op)?"("+t+")":t}
-    if(v.var)return v.var;
-    if(v.fn==="ub_sleep")return"wait "+label(v.args[0])+" seconds";
-    if(v.fn)return info(v.fn).label+(v.args&&v.args.length?" "+v.args.map(label).join(", "):"");
-    if(v.set)return"set "+v.set+" to "+label(v.to);
-    if(v.repeat)return"repeat "+v.repeat+" times";
-    if(v.forever)return"repeat forever";
-    if(v.until)return"repeat until "+label(v.until);
-    if(v.forEach)return"for each "+v.forEach+" in list";
-    if(v.if)return"if "+label(v.if)+(v.else?" … else":"");
-    if(v.cases)return"if … else if ("+v.cases.length+" questions)";
-    return String(v);
-  }
-  function colourOf(v){
-    if(isType(v))return info(v).colour;
-    if(Array.isArray(v)&&(v[0]==="LIST"||v[0]==="ITEM"))return COL.lists;
-    if(Array.isArray(v))return["ADD","MINUS","MULTIPLY","DIVIDE"].includes(v[0])?COL.math:COL.logic;
-    if(v&&v.fn)return info(v.fn).colour;
-    if(v&&(v.var||v.set))return COL.vars;
-    if(v&&(v.if||v.cases))return COL.logic;
-    return COL.loops;
-  }
-  function usable(v){const j=JSON.stringify(build(v));return[...j.matchAll(/"type":"([^"]+)"/g)].every(m=>!!Blockly.Blocks[m[1]])}
+  const kit=makeKit(spec,cfg),{info,build,label,colourOf,usable}=kit,items=kit.items;
   async function add(v){
     if(!usable(v))return false;
     if(mode!=="blocks")await setMode("blocks");
@@ -517,6 +572,13 @@ UB.attach=function(cfg){
     return true;
   }
   function chipInfo(v){return{label:label(v),colour:colourOf(v),ok:usable(v)}}
-  return{setMode,add,info,chipInfo,build,get mode(){return mode},get workspace(){return ws}};
+  async function load(json,note){
+    if(mode!=="blocks")await setMode("blocks");
+    if(mode!=="blocks")return false;
+    ws.clear();const j=JSON.parse(JSON.stringify(json));j.x=20;j.y=20;Blockly.serialization.blocks.append(j,ws);
+    ws.scroll(16-20*ws.scale,16-20*ws.scale);regen();say(note||"");return true;
+  }
+  function clear(){if(ws){ws.clear();regen();say("Drag blocks from the list on the left to build your program.")}}
+  return{setMode,add,load,clear,info,chipInfo,build,program:kit.program,get mode(){return mode},get workspace(){return ws}};
 };
 })();

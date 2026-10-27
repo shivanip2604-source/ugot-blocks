@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UGOT Simulator</title>
 <link rel="stylesheet" href="sim/sim.css"><link rel="stylesheet" href="assets/missions.css"></head><body>
-<header class="kbar"><a class="back" href="index.html">← All missions</a><a class="brand" href="index.html">🤖 UGOT Simulator</a></header>
+<header class="kbar"><a class="back" href="index.html">← All missions</a><span class="row"><a class="back" href="guide.html">🧩 Block Guide</a><a class="brand" href="index.html">🤖 UGOT Simulator</a></span></header>
 <div class="mhead"><div class="in"><span class="emoji" id="mEmoji" aria-hidden="true"></span><div><span class="lvl" id="mLevel"></span><h1 id="mName">Loading mission…</h1></div></div></div>
 <main>
 <div class="col">
@@ -10,12 +10,22 @@
  <section class="panel step"><h2><b>3</b> Plan it with a flowchart</h2>
   <p class="note" style="margin:0 0 8px">Start at the top and follow the arrows. Each step shows its block, already filled in: tap it to add it to your program, then drag it into place.</p>
   <div class="fc-legend" aria-label="Flowchart shapes"><span><i class="lg-term"></i>Start / End</span><span><i class="lg-do"></i>Action</span><span><i class="lg-sense"></i>Sensor reading</span><span><i class="lg-dec"></i>Question</span><span><i class="lg-loop"></i>Loop</span></div>
-  <div class="fc-scroll"><div class="fc" id="flow"></div></div><p class="tip" id="mTip" hidden></p></section>
- <section class="panel step"><h2><b>4</b> Build your program</h2>
+  <div class="fc-scroll"><div class="fc" id="flow"></div></div><p class="tip" id="mTip" hidden></p>
+  <h3>The flowchart as a program</h3>
+  <p class="note" style="margin:0 0 8px">Each block below is one step from the flowchart, in the same order. It is already loaded in step 4, ready to run.</p>
+  <div class="tabs" role="tablist" aria-label="Show the sample as"><button type="button" class="on" role="tab" aria-selected="true" data-v="b">🧩 Blocks</button><button type="button" role="tab" aria-selected="false" data-v="p">🐍 Python</button></div>
+  <div class="sample-b" id="sampleBlocks"></div><pre class="ub-code sample-p" id="samplePy" hidden></pre></section>
+ <section class="panel step"><h2><b>4</b> Run it, then change it</h2>
+  <p class="note" style="margin:0 0 8px">The sample program is loaded. Press <b>▶ Run on the robot</b> and watch. Then do the changes in step 5.</p>
+  <p class="tip" id="guideNote" hidden style="margin:0 0 10px"></p>
   <div class="editor"><pre class="gutter" id="gutter"></pre><textarea id="code" class="code" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Python code editor"></textarea></div>
   <div class="row" style="margin-top:12px"><button class="btn run go" id="runBtn" disabled>▶ Run on the robot</button><button class="btn alt" id="resetBtn">↺ Reset robot</button><span class="status" id="pystatus">Loading Python…</span></div>
-  <details style="margin-top:12px"><summary class="note">Stuck? Load an example program</summary><div class="row" style="margin-top:8px"><select id="example" aria-label="Example program"></select></div></details>
+  <div class="row" style="margin-top:10px"><button type="button" class="btn alt sm" id="sampleBack">↩ Put the sample back</button><button type="button" class="btn alt sm" id="emptyBtn">Start with empty blocks</button></div>
+  <details style="margin-top:12px"><summary class="note">More example programs (Python)</summary><div class="row" style="margin-top:8px"><select id="example" aria-label="Example program"></select></div></details>
  </section>
+ <section class="panel step" id="changesStep"><h2><b>5</b> Try these changes</h2>
+  <p class="note" style="margin:0 0 8px">Change one thing at a time, press Run, and see what happens. Tick each one when you have tried it.</p>
+  <ol class="changes" id="mChanges"></ol></section>
 </div>
 <div class="col stick">
  <section class="panel"><h2>Robot arena <span id="liveTag"></span></h2>
@@ -43,7 +53,7 @@
 </main>
 <script src="sim/engine.js"></script>
 <script src="assets/blockly/blockly_compressed.js"></script><script src="assets/blockly/blocks_compressed.js"></script><script src="assets/blockly/python_compressed.js"></script><script src="assets/blockly/msg/en.js"></script>
-<script src="assets/blocks.js"></script><script src="assets/missions.js"></script>
+<script src="assets/blocks.js"></script><script src="assets/missions.js"></script><script src="assets/guide.js"></script>
 <script>
 (function(){
  var id=new URLSearchParams(location.search).get("topic")||"";
@@ -85,6 +95,14 @@
  }
  document.addEventListener("click",function(e){var b=e.target.closest(".fc-chip");if(b&&inst&&!b.disabled)inst.add(specs[+b.dataset.i])});
  drawPlan();
+ // Step 5: small changes to try, ticked off in this browser.
+ var CK="ugot_changes_"+id,done={};try{done=JSON.parse(localStorage.getItem(CK)||"{}")}catch(e){}
+ $("mChanges").innerHTML=(M.changes||[]).map(function(c,i){return'<li><label><input type="checkbox" id="chg'+i+'" data-i="'+i+'"'+(done[i]?" checked":"")+'><span><b>'+esc(c[0])+'</b><small>👀 '+esc(c[1])+'</small></span></label></li>'}).join("");
+ $("mChanges").addEventListener("change",function(e){var i=e.target.dataset.i;if(i===undefined)return;done[i]=e.target.checked;try{localStorage.setItem(CK,JSON.stringify(done))}catch(err){}});
+ if(!(M.changes||[]).length)$("changesStep").hidden=true;
+ document.querySelector(".tabs").addEventListener("click",function(e){var b=e.target.closest("button[data-v]");if(!b)return;
+  this.querySelectorAll("button").forEach(function(x){var on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-selected",String(on))});
+  $("sampleBlocks").hidden=b.dataset.v!=="b";$("samplePy").hidden=b.dataset.v!=="p"});
 
  // Results in plain words: goal names instead of test codes.
  var busy=false;
@@ -121,6 +139,22 @@
    while(ctl.length>1)$("moreControls").appendChild(ctl[1])}
   if(!$("moreControls").children.length)$("moreControls").previousElementSibling.hidden=true;
   window.UGOT_BLOCKS=inst;drawPlan();tidy();
+  // The sample program: the flowchart as blocks, shown read-only and loaded into the editor.
+  if(inst){
+   var sample=inst.program(M.flow);
+   UBlocks.view($("sampleBlocks"),sample);
+   $("samplePy").textContent=UBlocks.toPython(sample);
+   // Arriving from the Block Guide: load that block's tiny program instead.
+   window.addEventListener("hashchange",function(){location.reload()});
+   var g=null,m=location.hash.match(/^#try-([a-z0-9-]+)$/);
+   if(m&&id==="lab")GUIDE.forEach(function(c){c.items.forEach(function(it){if(it.id===m[1])g=it})});
+   var mine=g?inst.program(g.flow):sample;
+   if(g){$("guideNote").hidden=false;$("guideNote").innerHTML="🧩 <b>Block Guide: "+esc(g.name)+"</b><br>"+esc(g.what)+"<br>✏️ <b>Try:</b> "+esc(g.try)}
+   var loadSample=function(){inst.load(mine,g?"Block Guide sample loaded. Press ▶ Run on the robot.":"This is the sample program. Press ▶ Run on the robot to watch it.")};
+   loadSample();
+   $("sampleBack").onclick=loadSample;
+   $("emptyBtn").onclick=function(){inst.clear()};
+  }
  };
  s.onerror=function(){$("mName").textContent="This mission could not load."};
  document.body.appendChild(s);

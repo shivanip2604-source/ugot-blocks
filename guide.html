@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Block Guide · UGOT Simulator</title>
+<link rel="stylesheet" href="sim/sim.css"><link rel="stylesheet" href="assets/missions.css">
+<style>
+.gnav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
+.gnav a{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--c);color:var(--ink);text-decoration:none;font-weight:700;font-size:.9rem;padding:6px 12px;border-radius:8px}
+.gnav a:hover{border-color:var(--c)}
+.gcat{margin:26px 0 10px;display:flex;align-items:center;gap:10px;scroll-margin-top:12px}
+.gcat i{width:14px;height:14px;border-radius:4px;background:var(--c)}
+.gcat h2{margin:0;font-size:1.25rem}
+.gcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.gcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.gcard h3{margin:0;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.gcard h3 span{display:inline-block;background:var(--c);color:#fff;border-radius:99px;padding:2px 10px;font-size:.86rem}
+.gcard p{margin:0;font-size:.93rem}
+.gview{border:1px solid var(--line);border-radius:10px;overflow:hidden;min-height:70px;background:var(--panel)}
+.gcard details summary{font-size:.86rem;color:var(--muted)}
+.gcard pre{margin:6px 0 0}
+.gtry{font-size:.9rem;color:var(--muted)}
+.gcard .btn{align-self:flex-start;text-decoration:none;margin-top:auto}
+</style></head><body>
+<header class="kbar"><a class="back" href="index.html">← All missions</a><a class="brand" href="index.html">🤖 UGOT Simulator</a></header>
+<div class="mhead"><div class="in"><span class="emoji" aria-hidden="true">🧩</span><div><h1>Block Guide</h1><p style="margin:2px 0 0;color:#b9cbe0">Every block, what it does, and a tiny program to try in Free Drive.</p></div></div></div>
+<div class="pick">
+ <nav class="gnav" id="gnav" aria-label="Block groups"></nav>
+ <div id="guide"><p class="note">Loading blocks…</p></div>
+</div>
+<script src="sim/engine.js"></script><script src="sim/tlab.js"></script>
+<script src="assets/blockly/blockly_compressed.js"></script><script src="assets/blockly/blocks_compressed.js"></script><script src="assets/blockly/python_compressed.js"></script><script src="assets/blockly/msg/en.js"></script>
+<script src="assets/blocks.js"></script><script src="assets/guide.js"></script>
+<script>
+(function(){
+ var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+ var api=UGOT.topics.lab.api.concat(UGOT.apiTime());
+ var kit=UBlocks.kit({api:api,helpers:true,sleep:"global"});
+ var nav="",h="";
+ GUIDE.forEach(function(c){
+  var slug="blocks-"+c.cat.toLowerCase().replace(/[^a-z]+/g,"-");
+  nav+='<a href="#'+slug+'" style="--c:'+c.colour+'">'+esc(c.cat)+'</a>';
+  h+='<div class="gcat" id="'+slug+'" style="--c:'+c.colour+'"><i></i><h2>'+esc(c.cat)+'</h2></div><div class="gcards">';
+  c.items.forEach(function(it){
+   var prog=kit.program(it.flow);
+   h+='<article class="gcard" style="--c:'+c.colour+'"><h3><span>'+esc(it.name)+'</span></h3><p>'+esc(it.what)+'</p>'+
+    '<div class="gview" data-id="'+it.id+'"></div>'+
+    '<details><summary>See it in Python</summary><pre class="ub-code">'+esc(UBlocks.toPython(prog))+'</pre></details>'+
+    '<p class="gtry">✏️ <b>Try:</b> '+esc(it.try)+'</p>'+
+    '<a class="btn run sm" href="mission.html?topic=lab#try-'+it.id+'">▶ Try it in Free Drive</a></article>';
+   it._prog=prog;
+  });
+  h+='</div>';
+ });
+ document.getElementById("gnav").innerHTML=nav;
+ document.getElementById("guide").innerHTML=h;
+ // Draw block pictures as they scroll into view.
+ var byId={};GUIDE.forEach(function(c){c.items.forEach(function(it){byId[it.id]=it})});
+ var draw=function(el){if(el.dataset.done)return;el.dataset.done=1;UBlocks.view(el,byId[el.dataset.id]._prog)};
+ var views=document.querySelectorAll(".gview");
+ if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){draw(e.target);io.unobserve(e.target)}})},{rootMargin:"300px"});views.forEach(function(v){io.observe(v)})}
+ else views.forEach(draw);
+})();
+</script></body></html>
