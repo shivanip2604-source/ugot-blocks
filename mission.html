@@ -8,7 +8,7 @@
  <section class="panel step"><h2><b>1</b> Your mission</h2><p class="big" id="mText"></p><h3>Goals</h3><ul class="goals" id="mGoals"></ul></section>
  <section class="panel step"><h2><b>2</b> Sensors the robot uses</h2><div class="sensors" id="mSensors"></div><p class="note" style="margin:10px 0 0">The robot also controls: <span id="mParts"></span></p></section>
  <section class="panel step"><h2><b>3</b> Plan it with a flowchart</h2>
-  <p class="note" style="margin:0 0 8px">Start at the top and follow the arrows. Each step shows the block that does it: tap a block to add it to your program.</p>
+  <p class="note" style="margin:0 0 8px">Start at the top and follow the arrows. Each step shows its block, already filled in: tap it to add it to your program, then drag it into place.</p>
   <div class="fc-legend" aria-label="Flowchart shapes"><span><i class="lg-term"></i>Start / End</span><span><i class="lg-do"></i>Action</span><span><i class="lg-sense"></i>Sensor reading</span><span><i class="lg-dec"></i>Question</span><span><i class="lg-loop"></i>Loop</span></div>
   <div class="fc-scroll"><div class="fc" id="flow"></div></div><p class="tip" id="mTip" hidden></p></section>
  <section class="panel step"><h2><b>4</b> Build your program</h2>
@@ -24,14 +24,15 @@
    <label class="note" for="speedSel">Speed</label><select id="speedSel"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
    <button class="btn alt sm" id="soundBtn" aria-pressed="true">🔊 Sound on</button>
    <input id="scrub" type="range" min="0" max="0" value="0" step="1" style="flex:1 1 140px;min-width:120px" aria-label="Playback position"></div>
+  <div class="ctrl" id="controls" style="margin-top:10px"></div>
   <div class="hud" id="hud"></div></section>
  <section class="panel"><h2>How did it go?</h2><div class="score" id="score"></div><ul class="checks" id="checks"></ul>
   <details class="msgs" id="msgs"><summary>Robot messages</summary><div class="console" id="console" role="log"></div></details></section>
- <details class="panel more"><summary>More tools: drive it yourself, change the test, sensor graph</summary><div>
+ <details class="panel more"><summary>More tools: drive it yourself, sensor noise, sensor graph</summary><div>
   <h3>Drive it yourself</h3>
   <div class="row"><button class="btn alt" id="liveBtn">🎮 Live drive</button><label class="note">Speed <input id="liveSpeed" type="range" min="10" max="100" value="40" style="width:110px"></label><span class="note" id="keyhelp"></span></div>
   <div id="livePanel" style="display:none;margin-top:10px"><div class="row" style="align-items:flex-start;gap:18px"><div class="pad" id="pad"><button data-k="q">⟲</button><button data-k="w">▲</button><button data-k="e">⟳</button><button data-k="a">◀</button><button data-k="s">▼</button><button data-k="d">▶</button></div><div class="row" id="liveButtons"></div></div></div>
-  <h3>Change the test</h3><div class="ctrl" id="controls" style="flex-direction:column;align-items:flex-start;margin-top:0"></div>
+  <h3>More test settings</h3><div class="ctrl" id="moreControls" style="flex-direction:column;align-items:flex-start;margin-top:0"></div>
   <div class="twin" style="margin-top:12px"><div><h3 id="insetTitle">Close-up</h3><canvas id="inset" width="600" height="400"></canvas></div><div><h3>Sensor graph</h3><canvas id="chart" width="600" height="400"></canvas></div></div>
   <h3>Every Python function</h3><div class="scroll"><table class="api" id="apiTable"></table></div>
   <div class="row" style="margin-top:10px"><label class="note" for="vol">Volume</label><input id="vol" type="range" min="0" max="100" value="60" style="width:100px"><label class="note"><input type="checkbox" id="voice" checked> Voice</label>
@@ -56,10 +57,12 @@
  $("mParts").textContent=M.parts.join(", ");
  if(M.tip){$("mTip").textContent="💡 "+M.tip;$("mTip").hidden=false}
 
- function chip(type){
-  if(!type)return"";
-  var i=inst?inst.info(type):{label:type.replace(/^ub_/,"").replace(/_/g," "),colour:"#6b7785",ok:false};
-  return'<button type="button" class="fc-chip" data-b="'+esc(type)+'" style="--c:'+i.colour+'"'+(i.ok?' title="Add this block to my program"':' disabled')+'>🧩 '+esc(i.label)+'</button>';
+ var specs=[];
+ function chip(spec){
+  if(!spec)return"";
+  var i=inst?inst.chipInfo(spec):{label:"…",colour:"#6b7785",ok:false};
+  specs.push(spec);
+  return'<button type="button" class="fc-chip" data-i="'+(specs.length-1)+'" style="--c:'+i.colour+'"'+(i.ok?' title="Add this block to my program"':' disabled')+'>🧩 '+esc(i.label)+'</button>';
  }
  function arrow(){return'<div class="fc-arrow" aria-hidden="true"></div>'}
  function seq(list){
@@ -75,11 +78,12 @@
    '<div class="fc-branches">'+br.map(function(b){return'<div class="fc-br"><span class="fc-lab '+b[2]+'">'+esc(b[0])+'</span>'+arrow()+'<div class="fc-seq">'+seq(b[1])+'</div></div>'}).join("")+'</div>';
  }
  function drawPlan(){
+  specs=[];
   $("flow").innerHTML='<div class="fc-item"><div class="fc-term">Start</div></div>'+arrow()+seq(M.flow)+arrow()+'<div class="fc-item"><div class="fc-term">End</div></div>';
   $("mSensors").innerHTML=M.sensors.map(function(x){var S=MISSIONS.sensorInfo[x[0]];
    return'<div class="sensor"><span class="ic" aria-hidden="true">'+S.icon+'</span><b>'+esc(S.name)+'</b><p>'+esc(S.what)+'</p>'+(x[1]?'<div>'+chip(x[1])+'</div>':'')+'</div>'}).join("");
  }
- document.addEventListener("click",function(e){var b=e.target.closest(".fc-chip");if(b&&inst&&!b.disabled)inst.add(b.dataset.b)});
+ document.addEventListener("click",function(e){var b=e.target.closest(".fc-chip");if(b&&inst&&!b.disabled)inst.add(specs[+b.dataset.i])});
  drawPlan();
 
  // Results in plain words: goal names instead of test codes.
@@ -111,7 +115,12 @@
   if(window.UBlocks)inst=UBlocks.attach({textarea:"code",api:T.api,helpers:true,sleep:"global",mode:"blocks",
    examples:Object.keys(T.examples).map(function(k){return T.examples[k].code}).join("\n"),
    getPy:function(){return new Promise(function(res,rej){UGOT.loadPyodideOnce(res,rej)})},onCode:UGOT.syncGutter});
-  drawPlan();tidy();
+  // Keep only the main test choice beside the arena; noise switches go under More tools.
+  var ctl=$("controls").children;
+  if(ctl.length){ctl[0].insertAdjacentHTML("afterbegin","<b>Test setting:</b> ");
+   while(ctl.length>1)$("moreControls").appendChild(ctl[1])}
+  if(!$("moreControls").children.length)$("moreControls").previousElementSibling.hidden=true;
+  window.UGOT_BLOCKS=inst;drawPlan();tidy();
  };
  s.onerror=function(){$("mName").textContent="This mission could not load."};
  document.body.appendChild(s);
