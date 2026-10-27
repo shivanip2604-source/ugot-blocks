@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UGOT Simulator</title>
+<link rel="stylesheet" href="sim/sim.css"><link rel="stylesheet" href="assets/missions.css"></head><body>
+<header class="kbar"><a class="back" href="index.html">← All missions</a><a class="brand" href="index.html">🤖 UGOT Simulator</a></header>
+<div class="mhead"><div class="in"><span class="emoji" id="mEmoji" aria-hidden="true"></span><div><span class="lvl" id="mLevel"></span><h1 id="mName">Loading mission…</h1></div></div></div>
+<main>
+<div class="col">
+ <section class="panel step"><h2><b>1</b> Your mission</h2><p class="big" id="mText"></p><h3>Goals</h3><ul class="goals" id="mGoals"></ul></section>
+ <section class="panel step"><h2><b>2</b> Sensors the robot uses</h2><div class="sensors" id="mSensors"></div><p class="note" style="margin:10px 0 0">The robot also controls: <span id="mParts"></span></p></section>
+ <section class="panel step"><h2><b>3</b> Plan it with a flowchart</h2>
+  <p class="note" style="margin:0 0 8px">Start at the top and follow the arrows. Each step shows the block that does it: tap a block to add it to your program.</p>
+  <div class="fc-legend" aria-label="Flowchart shapes"><span><i class="lg-term"></i>Start / End</span><span><i class="lg-do"></i>Action</span><span><i class="lg-sense"></i>Sensor reading</span><span><i class="lg-dec"></i>Question</span><span><i class="lg-loop"></i>Loop</span></div>
+  <div class="fc-scroll"><div class="fc" id="flow"></div></div><p class="tip" id="mTip" hidden></p></section>
+ <section class="panel step"><h2><b>4</b> Build your program</h2>
+  <div class="editor"><pre class="gutter" id="gutter"></pre><textarea id="code" class="code" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Python code editor"></textarea></div>
+  <div class="row" style="margin-top:12px"><button class="btn run go" id="runBtn" disabled>▶ Run on the robot</button><button class="btn alt" id="resetBtn">↺ Reset robot</button><span class="status" id="pystatus">Loading Python…</span></div>
+  <details style="margin-top:12px"><summary class="note">Stuck? Load an example program</summary><div class="row" style="margin-top:8px"><select id="example" aria-label="Example program"></select></div></details>
+ </section>
+</div>
+<div class="col stick">
+ <section class="panel"><h2>Robot arena <span id="liveTag"></span></h2>
+  <canvas id="arena" width="900" height="600" aria-label="Top-down view of the arena with the UGOT robot"></canvas>
+  <div class="row" style="margin-top:10px"><button class="btn alt sm" id="playBtn" disabled>⏯ Replay</button>
+   <label class="note" for="speedSel">Speed</label><select id="speedSel"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+   <button class="btn alt sm" id="soundBtn" aria-pressed="true">🔊 Sound on</button>
+   <input id="scrub" type="range" min="0" max="0" value="0" step="1" style="flex:1 1 140px;min-width:120px" aria-label="Playback position"></div>
+  <div class="hud" id="hud"></div></section>
+ <section class="panel"><h2>How did it go?</h2><div class="score" id="score"></div><ul class="checks" id="checks"></ul>
+  <details class="msgs" id="msgs"><summary>Robot messages</summary><div class="console" id="console" role="log"></div></details></section>
+ <details class="panel more"><summary>More tools: drive it yourself, change the test, sensor graph</summary><div>
+  <h3>Drive it yourself</h3>
+  <div class="row"><button class="btn alt" id="liveBtn">🎮 Live drive</button><label class="note">Speed <input id="liveSpeed" type="range" min="10" max="100" value="40" style="width:110px"></label><span class="note" id="keyhelp"></span></div>
+  <div id="livePanel" style="display:none;margin-top:10px"><div class="row" style="align-items:flex-start;gap:18px"><div class="pad" id="pad"><button data-k="q">⟲</button><button data-k="w">▲</button><button data-k="e">⟳</button><button data-k="a">◀</button><button data-k="s">▼</button><button data-k="d">▶</button></div><div class="row" id="liveButtons"></div></div></div>
+  <h3>Change the test</h3><div class="ctrl" id="controls" style="flex-direction:column;align-items:flex-start;margin-top:0"></div>
+  <div class="twin" style="margin-top:12px"><div><h3 id="insetTitle">Close-up</h3><canvas id="inset" width="600" height="400"></canvas></div><div><h3>Sensor graph</h3><canvas id="chart" width="600" height="400"></canvas></div></div>
+  <h3>Every Python function</h3><div class="scroll"><table class="api" id="apiTable"></table></div>
+  <div class="row" style="margin-top:10px"><label class="note" for="vol">Volume</label><input id="vol" type="range" min="0" max="100" value="60" style="width:100px"><label class="note"><input type="checkbox" id="voice" checked> Voice</label>
+   <button class="btn alt sm" id="copyBtn" disabled>Copy results</button><span class="status" id="copyStatus"></span><button class="btn alt sm" id="replBtn" disabled hidden>Run on current state</button></div>
+  <div hidden><span id="title"></span><span id="tagline"></span><span id="links"></span><div id="brief"></div></div>
+ </div></details>
+</div>
+</main>
+<script src="sim/engine.js"></script>
+<script src="assets/blockly/blockly_compressed.js"></script><script src="assets/blockly/blocks_compressed.js"></script><script src="assets/blockly/python_compressed.js"></script><script src="assets/blockly/msg/en.js"></script>
+<script src="assets/blocks.js"></script><script src="assets/missions.js"></script>
+<script>
+(function(){
+ var id=new URLSearchParams(location.search).get("topic")||"";
+ var M=MISSIONS.list[id];
+ if(!M){location.replace("index.html");return}
+ var $=function(x){return document.getElementById(x)},esc=UGOT.esc,inst=null;
+ $("mEmoji").textContent=M.emoji;$("mName").textContent=M.name;$("mLevel").textContent=MISSIONS.levels[M.level];
+ $("mText").textContent=M.text;
+ var g=Object.keys(M.goals).map(function(k){return M.goals[k]});
+ $("mGoals").innerHTML=g.length?g.map(function(t){return"<li>"+esc(t)+"</li>"}).join(""):"<li>No goals here. Just explore!</li>";
+ $("mParts").textContent=M.parts.join(", ");
+ if(M.tip){$("mTip").textContent="💡 "+M.tip;$("mTip").hidden=false}
+
+ function chip(type){
+  if(!type)return"";
+  var i=inst?inst.info(type):{label:type.replace(/^ub_/,"").replace(/_/g," "),colour:"#6b7785",ok:false};
+  return'<button type="button" class="fc-chip" data-b="'+esc(type)+'" style="--c:'+i.colour+'"'+(i.ok?' title="Add this block to my program"':' disabled')+'>🧩 '+esc(i.label)+'</button>';
+ }
+ function arrow(){return'<div class="fc-arrow" aria-hidden="true"></div>'}
+ function seq(list){
+  if(!list||!list.length)return'<div class="fc-none">nothing</div>';
+  return list.map(step).join(arrow());
+ }
+ function step(s){
+  if(s.do)return'<div class="fc-item"><div class="fc-do">'+esc(s.do)+'</div>'+chip(s.b)+'</div>';
+  if(s.sense)return'<div class="fc-item"><div class="fc-sense">📡 '+esc(s.sense)+'</div>'+chip(s.b)+'</div>';
+  if(s.loop)return'<div class="fc-loop"><div class="fc-head">↻ '+esc(s.loop)+chip(s.b)+'</div>'+arrow()+'<div class="fc-seq">'+seq(s.body)+'</div><div class="fc-back">↑ then go back to the top of the loop</div></div>';
+  var br=s.if?[["If yes",s.yes,"yes"],["If no",s.no,"no"]]:s.branches.map(function(b){return["If "+b[0],b[1],""]});
+  return'<div class="fc-item" style="max-width:none"><div class="fc-dec">'+esc(s.if||s.cases)+'</div>'+chip(s.b)+'</div>'+arrow()+
+   '<div class="fc-branches">'+br.map(function(b){return'<div class="fc-br"><span class="fc-lab '+b[2]+'">'+esc(b[0])+'</span>'+arrow()+'<div class="fc-seq">'+seq(b[1])+'</div></div>'}).join("")+'</div>';
+ }
+ function drawPlan(){
+  $("flow").innerHTML='<div class="fc-item"><div class="fc-term">Start</div></div>'+arrow()+seq(M.flow)+arrow()+'<div class="fc-item"><div class="fc-term">End</div></div>';
+  $("mSensors").innerHTML=M.sensors.map(function(x){var S=MISSIONS.sensorInfo[x[0]];
+   return'<div class="sensor"><span class="ic" aria-hidden="true">'+S.icon+'</span><b>'+esc(S.name)+'</b><p>'+esc(S.what)+'</p>'+(x[1]?'<div>'+chip(x[1])+'</div>':'')+'</div>'}).join("");
+ }
+ document.addEventListener("click",function(e){var b=e.target.closest(".fc-chip");if(b&&inst&&!b.disabled)inst.add(b.dataset.b)});
+ drawPlan();
+
+ // Results in plain words: goal names instead of test codes.
+ var busy=false;
+ function tidy(){
+  if(busy)return;busy=true;
+  document.querySelectorAll("#checks li strong").forEach(function(el){var t=el.textContent;if(M.goals[t])el.textContent=M.goals[t]});
+  document.querySelectorAll("#checks .b1").forEach(function(el){el.remove()});
+  var w=document.querySelector("#checks li.wait div");
+  if(w&&/Run your program/.test(w.textContent))w.textContent="Press ▶ Run on the robot to see how it goes.";
+  var st=document.querySelector("#score strong");
+  if(st&&/tests passed/.test(st.textContent)){var m=st.textContent.match(/(\d+) of (\d+)/);
+   st.textContent=m[1]+" of "+m[2]+" goals done";var n=document.querySelector("#score .note");
+   if(n)n.textContent=m[1]===m[2]?"🎉 Mission complete! Can you make the program shorter?":"Look at the goals with a cross, change your program and run again."}
+  if(/❌/.test($("console").textContent))$("msgs").open=true;
+  busy=false;
+ }
+ new MutationObserver(tidy).observe($("checks"),{childList:true,subtree:true});
+ new MutationObserver(tidy).observe($("score"),{childList:true,subtree:true});
+ new MutationObserver(tidy).observe($("console"),{childList:true});
+
+ var s=document.createElement("script");s.src="sim/t"+id+".js";
+ s.onload=function(){
+  UGOT.mount(id);document.title=M.name+" · UGOT Simulator";
+  var T=UGOT._state().T;
+  // Students start from an empty program; the examples stay under "Stuck?".
+  $("example").insertAdjacentHTML("afterbegin",'<option value="" selected>Choose an example…</option>');$("example").value="";
+  $("code").value="";UGOT.syncGutter();
+  if(window.UBlocks)inst=UBlocks.attach({textarea:"code",api:T.api,helpers:true,sleep:"global",mode:"blocks",
+   examples:Object.keys(T.examples).map(function(k){return T.examples[k].code}).join("\n"),
+   getPy:function(){return new Promise(function(res,rej){UGOT.loadPyodideOnce(res,rej)})},onCode:UGOT.syncGutter});
+  drawPlan();tidy();
+ };
+ s.onerror=function(){$("mName").textContent="This mission could not load."};
+ document.body.appendChild(s);
+})();
+</script></body></html>

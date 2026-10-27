@@ -283,6 +283,13 @@ def _ub_convert(src, spec_json):
     return _ub_json.dumps({"blocks":{"languageVersion":0,"blocks":blocks},"variables":[{"name":k,"id":v} for k,v in VARS.items()],"raw":raw[0]})
 `;
 
+/* ---------- names of the standard blocks, for flowcharts ---------- */
+const BUILTIN={controls_repeat_ext:["repeat … times","loops"],ub_forever:["repeat forever","loops"],controls_whileUntil:["repeat until …","loops"],
+  controls_forEach:["for each item in list","loops"],controls_flow_statements:["break out of loop","loops"],controls_if:["if … do","logic"],
+  logic_compare:["compare  =  <  >","logic"],logic_operation:["and / or","logic"],logic_negate:["not","logic"],ub_isnone:["is None","logic"],ub_in:["is in","logic"],
+  ub_sleep:["wait … seconds","wait"],ub_time:["robot time","wait"],math_arithmetic:["+ − × ÷","math"],math_number:["number","math"],
+  variables_set:["set variable to","vars"],math_change:["change variable by","vars"],text_print:["print","text"],lists_create_with:["make a list","lists"],ub_most_common:["most common item in","lists"]};
+
 /* ---------- toolbox ---------- */
 function toolbox(spec,cfg){
   const B=(type,extra)=>Object.assign({kind:"block",type},extra||{});
@@ -413,6 +420,25 @@ UB.attach=function(cfg){
   bar.addEventListener("click",e=>{const b=e.target.closest("button[data-m]");if(b&&b.dataset.m!==mode)setMode(b.dataset.m)});
   let start=cfg.mode||"python";try{start=localStorage.getItem(KEY)||start}catch(e){}
   if(start==="blocks")setMode("blocks");
-  return{setMode,get mode(){return mode}};
+  // Used by flowcharts: name and colour of a block, and adding one to the program.
+  const tbx=toolbox(spec,cfg),items={};
+  tbx.contents.forEach(c=>(c.contents||[]).forEach(it=>{if(!items[it.type])items[it.type]=it}));
+  function info(type){
+    const f=spec.find(x=>"ub_"+x.n===type);
+    if(f)return{label:human(f.n),colour:COL[f.cat],ok:true};
+    const b=BUILTIN[type];return b?{label:b[0],colour:COL[b[1]],ok:!!Blockly.Blocks[type]}:{label:type,colour:COL.py,ok:false};
+  }
+  async function add(type){
+    if(!Blockly.Blocks[type])return false;
+    if(mode!=="blocks")await setMode("blocks");
+    if(mode!=="blocks")return false;
+    const json=JSON.parse(JSON.stringify(items[type]||{type}));delete json.kind;
+    const m=ws.getMetrics(),n=ws.getTopBlocks(false).length;
+    json.x=(m.viewLeft+40+(n%4)*24)/ws.scale;json.y=(m.viewTop+30+(n%6)*36)/ws.scale;
+    const b=Blockly.serialization.blocks.append(json,ws);b.select();
+    say("Added “"+info(type).label+"”. Drag it into place in your program.");
+    return true;
+  }
+  return{setMode,add,info,get mode(){return mode}};
 };
 })();
