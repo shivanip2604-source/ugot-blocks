@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criterion C Quizzes | AIA UGOT</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-top:16px}
+.tcard{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;background:#fff;border:1px solid var(--line);border-top:5px solid var(--blue);border-radius:10px;padding:14px;font:inherit;cursor:pointer;color:var(--ink)}
+.tcard:hover{box-shadow:0 4px 14px rgba(15,42,67,.15)}
+.tcard .e{font-size:1.7rem}.tcard b{color:var(--navy)}.tcard small{color:var(--muted)}
+.tcard.py{border-top-color:var(--accent)}
+.exbox{margin-top:16px;padding:14px 16px;border-radius:10px;line-height:1.5}
+.exbox.ok{background:#effaf3;border:1px solid #9bd8b4}.exbox.no{background:#fff4f0;border:1px solid #f1b7a4}
+.nbtn{margin-top:10px;background:var(--navy);color:#fff;border:none;border-radius:7px;padding:10px 20px;font:inherit;font-weight:700;cursor:pointer}
+.fillin{font:inherit;font-family:Consolas,Menlo,monospace;border:2px solid #9aa7b3;border-radius:6px;padding:6px 10px;min-width:150px}
+.fillin.good,select.good{border-color:#2e7d32;background:#effaf3}.fillin.bad,select.bad{border-color:#c62828;background:#fff4f0}
+.codeq{background:#0f2a43;color:#e6eef7;padding:18px;border-radius:10px;font-family:Consolas,Menlo,monospace;white-space:pre-wrap;line-height:2}
+.codeq .fillin{background:#fff;color:#111}
+.textq{font-size:1.2rem;line-height:2.2}
+.mtable{width:100%;border-collapse:collapse}.mtable td{padding:10px;border-bottom:1px solid var(--line)}
+.mtable .ml{font-weight:700;color:var(--navy);width:35%}
+.mtable select{font:inherit;padding:8px;width:100%;border:2px solid #9aa7b3;border-radius:6px}
+.fixit{color:#2e7d32;font-size:.88rem;margin-top:3px}
+#result{padding:30px 24px;text-align:center}
+#result button{background:var(--accent);color:#fff;border:none;padding:12px 26px;border-radius:8px;font:inherit;font-weight:700;margin:6px;cursor:pointer}
+</style></head><body>
+<div class="topbar"><a class="brand" href="index.html">🤖 AIA · UGOT</a><a class="tab" href="index.html">Home</a><a class="tab" href="criteria-a.html">Criteria A</a><a class="tab" href="criteria-b.html">Criteria B</a><a class="tab active" href="criteria-c.html">Criteria C</a><a class="tab" href="criteria-d.html">Criteria D</a><a class="tab" href="simulator.html">Simulators</a><a class="tab" href="playground.html">Python Playground</a><a class="tab" href="tutorials.html">Tutorials</a></div>
+<header class="hero"><span class="tag">MYP Design · Criterion C</span><h1>Criterion C Quizzes</h1><p>Test your understanding of the UGOT sensors and actuators and your Python coding. Each quiz has three parts: Kahoot-style multiple choice, fill in the blank, and match the columns.</p></header>
+<div class="loginbar" id="loginbar">
+  <span>👋 Enter your name and class to save your quiz scores to the class Google Sheet:</span>
+  <input id="loginName" type="text" placeholder="Your name" autocomplete="off">
+  <input id="loginClass" type="text" placeholder="Class (e.g. 10B)" autocomplete="off">
+  <button onclick="doLogin()">Start / Log in</button></div>
+<main><section><div class="quiz-card" id="quizCard" style="padding:24px">
+<div id="picker"><h2 style="margin-top:0">Choose a quiz</h2><p class="sub">Every topic quiz also includes a few Python questions. You can play as many times as you like: your best attempt counts in the gradebook.</p><div class="tgrid" id="tgrid"></div></div>
+<div id="play" style="display:none;margin:-24px">
+<div class="quiz-head"><div style="font-weight:700;opacity:.9" id="title"></div><div class="qnum" id="qnum" style="color:#e8e8ff;margin-top:6px">PART 1</div><h3 class="qtext" id="qtext" style="color:#fff">…</h3><div class="timer-wrap" id="timerWrap"><div class="timer-bar" id="timerBar"></div></div></div>
+<div class="quiz-body" id="body"></div>
+<div class="quiz-foot"><span>Points: <span class="score-pill" id="scorePill">0</span></span><span></span></div></div>
+<div id="result" style="display:none"><h2 style="margin-top:0">🎉 Quiz complete!</h2><p style="font-size:1.6rem;font-weight:800;color:var(--navy)" id="finalScore"></p><p id="breakdown"></p><p id="submitStatus" class="save-status"></p><button id="again">Play again</button><button id="others" style="background:var(--navy)">Choose another quiz</button></div>
+</div></section></main>
+<footer><p>AIA Grade 10 Digital Design &amp; IB MYP Computer Science · UGOT AI Robotics: Designing Autonomous Vehicles for Safer Communities</p></footer>
+<script src="assets/config.js"></script><script>window.QUIZ_CRITERION="C";window.LESSON={name:"Criterion C quizzes",quiz:[]};</script><script src="assets/quizzes-c.js"></script><script src="assets/site.js"></script><script src="assets/quiz-engine.js"></script>
+</body></html>

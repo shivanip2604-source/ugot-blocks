@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Tutorial | AIA UGOT</title>
+<link rel="stylesheet" href="assets/site.css"><link rel="stylesheet" href="sim/sim.css">
+<style>
+.wrap{max-width:900px;margin:0 auto;padding:18px 16px 60px;display:flex;flex-direction:column;gap:16px}
+video{width:100%;border-radius:12px;background:#000;aspect-ratio:16/9}
+.novid{aspect-ratio:16/9;background:var(--navy);color:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
+.step h2{text-transform:none;letter-spacing:0;font-size:1.15rem;color:var(--ink);margin:0 0 6px}
+.step .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:.8rem;margin-right:8px;vertical-align:middle}
+.step p{margin:0 0 10px;line-height:1.6}
+.cell{border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.cell textarea{width:100%;display:block;box-sizing:border-box;border:0;background:var(--code-bg);color:var(--code-ink);font:13.5px/1.55 Consolas,Menlo,monospace;padding:12px;resize:vertical;min-height:70px;tab-size:4;white-space:pre;overflow:auto}
+.cell .bar{display:flex;gap:8px;align-items:center;background:var(--chip);padding:6px 10px}
+.cell .o{background:#06182a;color:#cfe8ff;font:13px/1.5 Consolas,Menlo,monospace;padding:8px 12px;white-space:pre-wrap;min-height:20px;display:none}
+.cell .o .err{color:#ff9d8f}
+.nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.btn.sm{padding:5px 12px;font-size:.85rem}
+ul.pts{margin:6px 0 10px 20px}
+.task{background:#fff7e0;border:1px solid #f0d58a;color:#4a3a00;border-radius:12px;padding:14px 16px}
+.task a{color:#8a4b00;font-weight:700}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .task{background:#3a2f10;border-color:#6b5520;color:#f6e3a8}}
+</style></head><body>
+<div class="topbar"><a class="brand" href="index.html">🤖 AIA · UGOT</a><a class="tab" href="index.html">Home</a><a class="tab" href="criteria-b.html">Criteria B</a><a class="tab" href="criteria-c.html">Criteria C</a><a class="tab" href="simulator.html">Simulators</a><a class="tab" href="playground.html">Python Playground</a><a class="tab on" href="tutorials.html">Tutorials</a></div>
+<div class="top"><div class="in"><div><span class="tag" id="tag">Lesson</span><h1 id="title">Loading</h1></div><p id="goal"></p></div></div>
+<div class="wrap" id="wrap"></div>
+<script>window.LESSON={name:"Python Tutorial"};</script>
+<script src="assets/config.js"></script><script src="assets/site.js"></script><script src="assets/tutorials.js"></script><script src="assets/challenges.js"></script><script src="assets/pyrunner.js"></script>
+<script>
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const id=new URLSearchParams(location.search).get("id")||"01";const i=TUTORIALS.findIndex(t=>t.id===id);const T=TUTORIALS[Math.max(0,i)];const idx=Math.max(0,i);
+document.title=T.title+" | AIA UGOT";document.getElementById("tag").textContent="Lesson "+T.id+" of "+TUTORIALS.length;document.getElementById("title").textContent=T.emoji+" "+T.title;document.getElementById("goal").textContent=T.goal;
+let ready=false;PyRun.init().then(()=>{ready=true;document.querySelectorAll(".run").forEach(b=>b.disabled=false)}).catch(e=>{document.querySelectorAll(".st").forEach(s=>s.textContent="Python could not load: "+e.message)});
+let h=`<video id="vid" controls preload="metadata" poster="videos/poster-${T.id}.jpg" src="videos/lesson-${T.id}.mp4"></video>`;
+h+=T.slides.map((s,k)=>`<div class="panel step"><h2><span class="n">${k+1}</span>${esc(s.h)}</h2><p>${esc(s.say)}</p>${s.bullets?'<ul class="pts">'+s.bullets.map(b=>"<li>"+esc(b)+"</li>").join("")+"</ul>":""}${s.code?`<div class="cell"><textarea spellcheck="false" rows="${Math.min(14,s.code.split("\n").length+1)}" data-k="${k}">${esc(s.code)}</textarea><div class="bar"><button class="btn run sm" data-k="${k}" disabled>▶ Run</button><button class="btn alt sm" data-reset="${k}">Reset</button><span class="status st"></span></div><div class="o" id="o${k}"></div></div>`:""}</div>`).join("");
+h+=`<div class="task"><strong>🎯 Your turn:</strong> ${esc(T.task)}<br>Practise this in the <a href="playground.html#${T.challenges[0]}">Python Playground</a>: ${T.challenges.map(c=>{const ch=PRACTICE.challenges.find(x=>x.id===c);return ch?`<a href="playground.html#${c}">${esc(ch.title)}</a>`:""}).filter(Boolean).join(" · ")}.</div>`;
+h+=`<div class="nav">${idx>0?`<a class="btn alt" href="tutorial.html?id=${TUTORIALS[idx-1].id}">◀ ${esc(TUTORIALS[idx-1].title)}</a>`:"<span></span>"}<button class="btn" id="mark">✔ Mark lesson as done</button>${idx<TUTORIALS.length-1?`<a class="btn" href="tutorial.html?id=${TUTORIALS[idx+1].id}">${esc(TUTORIALS[idx+1].title)} ▶</a>`:'<a class="btn" href="playground.html">Go to challenges ▶</a>'}</div>`;
+document.getElementById("wrap").innerHTML=h;
+const vid=document.getElementById("vid");vid.addEventListener("error",()=>{vid.outerHTML='<div class="novid"><div><strong>Video not found.</strong><br>Put the lesson MP4 files in the <code>videos</code> folder next to this page. The written lesson below works without them.</div></div>'},true);
+document.querySelectorAll("button.run").forEach(b=>b.onclick=async()=>{const k=+b.dataset.k,ta=document.querySelector('textarea[data-k="'+k+'"]'),o=document.getElementById("o"+k);b.disabled=true;let r;try{r=await PyRun.run(ta.value)}catch(e){r={out:"",err:String(e)}}b.disabled=false;o.style.display="block";o.innerHTML=(r.out?esc(r.out):"")+(r.err?(r.out?"\n":"")+'<span class="err">'+esc(r.err)+"</span>":"")||"(no output)"});
+document.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{const k=+b.dataset.reset;document.querySelector('textarea[data-k="'+k+'"]').value=T.slides[k].code});
+document.querySelectorAll(".cell textarea").forEach(ta=>ta.addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const a=ta.selectionStart;ta.value=ta.value.slice(0,a)+"    "+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=a+4}if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();ta.closest(".cell").querySelector("button.run").click()}}));
+let seen={};try{seen=JSON.parse(localStorage.getItem("ugot_tutdone")||"{}")}catch(e){}
+const mk=document.getElementById("mark");const upd=()=>{mk.textContent=seen[T.id]?"✔ Done (click to undo)":"✔ Mark lesson as done"};upd();
+mk.onclick=()=>{seen[T.id]=!seen[T.id];try{localStorage.setItem("ugot_tutdone",JSON.stringify(seen))}catch(e){}upd()};
+</script></body></html>

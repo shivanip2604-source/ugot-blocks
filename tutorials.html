@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Tutorials | AIA UGOT</title>
+<link rel="stylesheet" href="assets/site.css"><link rel="stylesheet" href="sim/sim.css">
+<style>
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 50px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,42,67,.15)}
+.card .hd{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.card .hd span{font-size:2.2rem}.card .hd b{font-size:.8rem;letter-spacing:.08em;opacity:.8}
+.card .bd{padding:14px 16px;flex:1}.card h3{margin:0 0 6px;font-size:1.05rem}.card p{margin:0;color:var(--muted);font-size:.92rem}
+.card .ft{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;font-size:.85rem;color:var(--muted);align-items:center}
+.done{color:var(--ok);font-weight:800}
+.path{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 18px}.path a{background:var(--panel);border:1px solid var(--line);padding:8px 14px;border-radius:999px;text-decoration:none;color:var(--ink);font-weight:700;font-size:.9rem}
+</style></head><body>
+<div class="topbar"><a class="brand" href="index.html">🤖 AIA · UGOT</a><a class="tab" href="index.html">Home</a><a class="tab" href="criteria-b.html">Criteria B</a><a class="tab" href="criteria-c.html">Criteria C</a><a class="tab" href="simulator.html">Simulators</a><a class="tab" href="playground.html">Python Playground</a><a class="tab on" href="tutorials.html">Tutorials</a></div>
+<div class="top"><div class="in"><div><span class="tag">Learn · Python</span><h1>Python Tutorials and Videos</h1></div><p>14 short lessons. Watch the narrated video, run the code yourself, then practise with challenges.</p></div></div>
+<div class="wrap">
+<div class="path"><a href="#t01">① Start here</a><a href="playground.html">② Practise challenges</a><a href="simulator.html?topic=lab">③ Drive the robot sandbox</a><a href="criteria-c.html">④ Build your Criterion C project</a></div>
+<div class="grid" id="grid"></div></div>
+<script>window.LESSON={name:"Python Tutorials"};</script>
+<script src="assets/config.js"></script><script src="assets/site.js"></script><script src="assets/tutorials.js"></script>
+<script>
+let seen={};try{seen=JSON.parse(localStorage.getItem("ugot_tutdone")||"{}")}catch(e){}
+document.getElementById("grid").innerHTML=TUTORIALS.map(t=>`<a class="card" id="t${t.id}" href="tutorial.html?id=${t.id}"><div class="hd"><span>${t.emoji}</span><b>LESSON ${t.id}</b></div><div class="bd"><h3>${t.title}</h3><p>${t.goal}</p></div><div class="ft"><span>🎬 ${t.mins} min video</span><span>·</span><span>${t.slides.length} parts</span>${seen[t.id]?'<span class="done" style="margin-left:auto">✔ done</span>':""}</div></a>`).join("");
+</script></body></html>

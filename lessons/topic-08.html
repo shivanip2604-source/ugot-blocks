@@ -1,0 +1,213 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Topic 08 · Tracking and Tracing | Criterion B</title><link rel="stylesheet" href="../assets/site.css"><style>nav.toc a.hot{color:#c4491b}</style><style>.abc{display:flex;flex-wrap:wrap;gap:8px;max-width:1100px;margin:14px auto 0;padding:0 20px}.abc a{background:#fff;border:2px solid #cfd8e1;color:#0f2a43;text-decoration:none;font-weight:700;border-radius:999px;padding:6px 16px;font-size:.92rem}.abc a.on{background:#0f2a43;color:#fff;border-color:#0f2a43}.abc a:hover{border-color:#e8622c}
+</style></head><body>
+<div class="topbar"><a class="brand" href="../index.html">🤖 AIA · UGOT</a><a class="tab" href="../index.html">Home</a><a class="tab" href="../criteria-a.html">Criteria A</a><a class="tab active" href="../criteria-b.html">Criteria B</a><a class="tab" href="../criteria-c.html">Criteria C</a><a class="tab" href="../criteria-d.html">Criteria D</a><a class="tab" href="../simulator.html">Simulators</a><a class="tab" href="../playground.html">Python Playground</a><a class="tab" href="../tutorials.html">Tutorials</a></div>
+<header class="hero">
+  <div class="crumbs"><a href="../index.html">Home</a> › <a href="../criteria-b.html">Criterion B</a> › Topic 08</div>
+  <span class="tag">AIA · Grade 10 Digital Design · UGOT AI Robotics</span>
+  <h1>🧭 Criterion B — Topic 08: Tracking and Tracing</h1>
+  <p><strong>UGOT kit used:</strong> Line-tracking sensors + tag-recognition camera</p>
+  <p>A worked exemplar for B1 Design Specification, B2 Design Ideas, B3 Chosen Design and B4 Detailed Plans. Use it as a model for your own e-portfolio.</p>
+</header>
+<nav class="abc" aria-label="Criteria for this topic"><a class="" href="criteria-a-08.html">A · Investigating</a><a class="on" href="topic-08.html">B · Developing ideas</a><a class="" href="criteria-c-08.html">C · Creating the solution</a><a class="" href="criteria-d-08.html">D · Evaluating</a></nav>
+<nav class="toc">
+  <a href="#brief">Design Brief</a><a href="#b1">B1 Specification</a><a href="#b2">B2 Ideas</a><a href="#b3">B3 Chosen Design</a>
+  <a href="#b4">B4 Plans</a><a href="#integration">Integration</a><a href="#cad" class="hot">🛠️ CAD &amp; downloads</a><a href="#build">Build and test</a><a href="#quiz">Quiz</a><a class="hot" href="criteria-c-08.html">➡ Criterion C</a>
+</nav>
+<div class="loginbar" id="loginbar">
+  <span>👋 Enter your name and class to save your challenge answers and quiz scores to the class Google Sheet:</span>
+  <input id="loginName" type="text" placeholder="Your name" autocomplete="off">
+  <input id="loginClass" type="text" placeholder="Class (e.g. 10B)" autocomplete="off">
+  <button onclick="doLogin()">Start / Log in</button></div>
+<main>
+<div class="ref-layout">
+<aside class="ref-side"><img src="../img/ugot_parts_reference.png" alt="Real UGOT kit parts"><div class="cap">The real UGOT kit parts you are building with</div></aside>
+<div>
+
+<section id="brief"><h2>Design Brief</h2><p class="sub">Context that frames the whole Criterion B response for this lesson.</p>
+<div class="card">
+<p><strong>Problem context (real world &amp; UAE link):</strong> A delivery robot in a hospital or warehouse follows a painted line and reads wall tags to know which room it is in.</p>
+<p><strong>Design task:</strong> Design a <strong>Python-controlled solution on the ready UGOT kit robot</strong> that uses the UGOT <em>Line-tracking sensors + tag-recognition camera</em>. It must be programmable, testable and demonstrable by a Grade 10 student in this unit. This is a Digital Design unit: there is <strong>no 3D printing or laser cutting</strong>.</p>
+<p><strong>User:</strong> a 14–16 year-old MYP student building, coding, testing and demonstrating the robot in class and at the AIA STEM showcase.</p>
+</div></section>
+
+<section id="b1"><h2>B1 · Design Specification</h2>
+<p class="sub">Each success criterion is described and justified using ACCESSFM. Rows marked <span class="measurable">&nbsp;&nbsp;&nbsp;&nbsp;</span> are <strong>measurable</strong>. Size and mass are digital design figures from the CAD model: nothing is printed or cut.</p>
+<div class="card" style="overflow-x:auto;"><table>
+<tr><th style="width:12%">Specification</th><th style="width:7%">#</th><th style="width:42%">Success criterion</th><th>Justification</th></tr>
+<tr><td rowspan="2"><strong>Aesthetics</strong></td><td>1.1</td>
+<td>Colour scheme of black and white contrast with safety-orange pointer.</td><td>A high-visibility, consistent palette makes the tool instantly recognisable and looks professional at the AIA STEM showcase. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ag</a></small></td></tr>
+<tr><td>1.2</td>
+<td>Smooth, rounded external edges (fillet ≥ 2 mm) with no visible fasteners on the outer shell.</td><td>Rounded edges read as safe to handle and avoid snagging. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ag</a></small></td></tr>
+<tr><td rowspan="2"><strong>Cost</strong></td><td>2.1</td>
+<td class="measurable">Estimated cost of added parts and test props per robot ≤ <strong>AED 70</strong> (kit parts are already owned).</td><td>The school already owns the UGOT kit, so only small extras such as card, tape and printed test cards count; keeps a class set affordable. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ae</a></small></td></tr>
+<tr><td>2.2</td>
+<td>Re-uses UGOT kit servos, sensors and fasteners; no proprietary parts.</td><td>Avoids extra purchase orders and keeps the design compatible with kits the school already owns.</td></tr>
+<tr><td rowspan="2"><strong>Customer</strong></td><td>3.1</td>
+<td>Mounts on the UGOT robot using only the kit's own fixings and hand tools (check hole spacing against your own kit).</td><td>Every group's UGOT kit must be able to accept the part.</td></tr>
+<tr><td>3.2</td>
+<td>Assembles in one lesson (≤ 70 min) by a pair of Grade 10 students.</td><td>Matches the AIA single-period lesson structure for this unit. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ae</a></small></td></tr>
+<tr><td rowspan="2"><strong>Environment</strong></td><td>4.1</td>
+<td class="measurable">At least <strong>80%</strong> of any added material is reused card, paper or kit parts; nothing new is printed or cut.</td><td>Reused card and the kit's own parts follow the 6 R's (Reduce, Reuse) and need no fabrication machines.</td></tr>
+<tr><td>4.2</td>
+<td class="measurable">Added mass on the UGOT robot ≤ <strong>100 g</strong>.</td><td>Lower mass puts less load on the UGOT motors and battery.</td></tr>
+<tr><td rowspan="2"><strong>Size</strong></td><td>5.1</td>
+<td class="measurable">Overall envelope ≤ <strong>200 × 220 × 40 mm</strong> (L × W × H).</td><td>Keeps the module compact enough to mount on the UGOT chassis without hitting its wheels or the floor. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Aa</a></small></td></tr>
+<tr><td>5.2</td>
+<td>The robot and its test course fit on one standard classroom table (about 1.2 m × 0.8 m).</td><td>The unit is tested at a normal desk in a single lesson, with no workshop machines.</td></tr>
+<tr><td rowspan="2"><strong>Safety</strong></td><td>6.1</td>
+<td>Sensors sit flush so a bump cannot snap them off, and there are no sharp wing tips.</td><td>Reduces the chance of injury to the student building, testing and demonstrating it. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ad, Af</a></small></td></tr>
+<tr><td>6.2</td>
+<td>No exposed sharp corners: all edges filleted or sanded; sensor lens recessed about 2 mm to avoid impact cracks.</td><td>Standard safe-handling requirement for a student-built robotic part. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Af</a></small></td></tr>
+<tr><td rowspan="4"><strong>Function</strong></td><td>7.1</td>
+<td class="measurable">Follows a <strong>20 mm</strong> wide line at <strong>0.15 m/s</strong> with fewer than 2 line losses per lap.</td><td>Directly measures whether the design solves the problem in the scenario above. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Aa, Ac</a></small></td></tr>
+<tr><td>7.2</td>
+<td class="measurable">Camera reads a tag at <strong>100–300 mm</strong> distance (design target; verify with your tags).</td><td>Sensor range figures are design targets; the housing must never block or shorten them. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ab, Ad</a></small></td></tr>
+<tr><td>7.3</td>
+<td>The sensor's field of view is unobstructed by any part of the housing.</td><td>A sensor that is blocked gives wrong data, so the design fails its main job.</td></tr>
+<tr><td>7.4</td>
+<td>Sensors and servos are replaceable with hand tools in under 2 minutes.</td><td>Classroom robots are reused across cohorts, so parts will wear and break. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ac</a></small></td></tr>
+<tr><td rowspan="2"><strong>Material</strong></td><td>8.1</td>
+<td>Uses only parts from the UGOT kit, plus recycled card for test props.</td><td>Kit parts are reliable and already paid for; recycled card is free and quick to change. <small class="atag" style="display:block;margin-top:4px;color:#e8622c;font-weight:700">From research: <a href="criteria-a-08.html#a2" style="color:#e8622c">Ab</a></small></td></tr>
+<tr><td>8.2</td>
+<td>Flat test props (cards, signs, tags) are printed on paper or card, not 3D-printed or laser-cut.</td><td>Paper props take minutes, can be changed after every test and need no workshop machines.</td></tr>
+</table></div>
+<div class="challenge"><h4>🧩 Your turn — write your own B1</h4>
+<p><strong>All:</strong> write 2 success criteria (one Aesthetics, one Safety) for <em>your</em> design.<br><strong>Most:</strong> make at least one measurable (a number and a unit).<br><strong>Some:</strong> justify it with a research reference (a spec sheet, a standard or a real product).</p>
+<textarea id="resp-b1" placeholder="e.g. Aesthetics 1.1: ... because ..."></textarea>
+<div class="row"><button onclick="saveChallenge('B1','Write your own success criteria','resp-b1')">Save my answer</button><span class="save-status" id="status-b1"></span></div></div>
+</section>
+
+<section id="b2"><h2>B2 · Design Ideas <span class="badge idea">3 different ideas</span></h2>
+<p class="sub">Three ideas that differ in <strong>mechanism and form</strong>, not just looks. Each sketch is an isometric render of the 3D CAD model with the sensor and mount labelled.</p>
+<div class="concept-grid">
+<div class="concept-card card"><img src="../img/t08_ca_iso.png" alt="Concept 1 Line-Wing">
+<h3>Concept 1 — “Line-Wing” <span class="badge sel">SELECTED</span></h3>
+<div class="tagline">Seven-sensor swept wing</div><p>A swept wing carries seven line sensors across the front so the robot sees the line early and corrects smoothly on curves.</p>
+<p class="legend">Envelope 184.1 × 204.0 × 29.0 mm · ≈ 54 g · ≈ AED 26</p></div><div class="concept-card card"><img src="../img/t08_cb_iso.png" alt="Concept 2 Tag-Frame">
+<h3>Concept 2 — “Tag-Frame”</h3>
+<div class="tagline">Tag camera gate</div><p>A tall frame holds a camera that reads tag panels at head height. Great for tags, but it does not follow lines.</p>
+<p class="legend">Envelope 134.0 × 101.9 × 141.0 mm · ≈ 47 g · ≈ AED 25</p></div><div class="concept-card card"><img src="../img/t08_cc_iso.png" alt="Concept 3 Trace-Pointer">
+<h3>Concept 3 — “Trace-Pointer”</h3>
+<div class="tagline">Arrow body with line sensor and camera</div><p>A pointed chevron body with one line sensor underneath and a small tag camera on top, plus a marker holder for tracing routes. Compact, but one sensor loses curves.</p>
+<p class="legend">Envelope 212.0 × 106.6 × 34.0 mm · ≈ 46 g · ≈ AED 25</p></div>
+</div>
+<div class="challenge"><h4>🧩 Your turn — sketch a 4th idea</h4>
+<p><strong>All:</strong> describe a 4th idea in 2–3 sentences. It must differ by <em>mechanism</em>, not just colour or shape.<br><strong>Most:</strong> say which ACCESSFM criteria it would score best and worst on.<br><strong>Some:</strong> describe it so well that a partner could draw it from your words alone.</p>
+<textarea id="resp-b2" placeholder="My 4th design idea is..."></textarea>
+<div class="row"><button onclick="saveChallenge('B2','Sketch a 4th design idea','resp-b2')">Save my answer</button><span class="save-status" id="status-b2"></span></div></div>
+</section>
+
+<section id="b3"><h2>B3 · Chosen Design</h2><p class="sub">Each idea is rated 1 (poor) – 5 (excellent) against every ACCESSFM success criterion from B1.</p>
+<div class="card" style="overflow-x:auto;"><table>
+<tr><th>Category</th><th>What is being evaluated</th><th>Concept 1<br>Line-Wing</th><th>Concept 2<br>Tag-Frame</th><th>Concept 3<br>Trace-Pointer</th></tr>
+<tr><td>Aesthetics</td><td>High-visibility, rounded, safe-looking shell</td><td class="rating r5">5</td><td class="rating r4">4</td><td class="rating r4">4</td></tr><tr><td>Cost</td><td>≤ AED 60, reuses kit parts</td><td class="rating r3">3</td><td class="rating r3">3</td><td class="rating r5">5</td></tr><tr><td>Customer</td><td>Fits the UGOT mount, builds in one lesson</td><td class="rating r4">4</td><td class="rating r3">3</td><td class="rating r3">3</td></tr><tr><td>Environment</td><td>Reused or recyclable material, light</td><td class="rating r4">4</td><td class="rating r4">4</td><td class="rating r4">4</td></tr><tr><td>Size</td><td>Fits ≤ 200×220×40 mm</td><td class="rating r4">4</td><td class="rating r3">3</td><td class="rating r5">5</td></tr><tr><td>Safety</td><td>No pinch points or sharp edges</td><td class="rating r4">4</td><td class="rating r4">4</td><td class="rating r4">4</td></tr><tr><td>Function</td><td>Meets the measurable function targets</td><td class="rating r5">5</td><td class="rating r3">3</td><td class="rating r3">3</td></tr><tr><td>Material</td><td>Kit parts and card used sensibly</td><td class="rating r4">4</td><td class="rating r4">4</td><td class="rating r4">4</td></tr>
+<tr style="font-weight:700;background:#eef3f8;"><td colspan="2">Total (/40)</td><td>33</td><td>28</td><td>32</td></tr></table></div>
+<div class="callout"><strong>Justification of the chosen design:</strong> Concept 1, “Line-Wing”, scores highest overall (33/40; the others score 28 and 32). It wins by the largest margin on <strong>Function</strong> and <strong>Aesthetics</strong>, because its seven-sensor wing reads a wide strip of floor, so it never loses the line on a curve. Its estimated cost of about AED 26 and mass of about 54 g sit inside the B1 limits, and the weaker ideas lose marks where they break a measurable criterion.</div>
+<div class="fig"><img src="../img/t08_ca_iso.png" alt="Chosen design" style="max-width:720px;"><figcaption>The chosen design, presented again: Concept 1 “Line-Wing”.</figcaption></div>
+<div class="challenge"><h4>🧩 Your turn — rate and justify</h4>
+<p><strong>All:</strong> pick one rating you disagree with, give your own 1–5 and say why.<br><strong>Most:</strong> re-total the scores. Does the chosen design still win?<br><strong>Some:</strong> write a 3-sentence justification in the style above for <em>your</em> three ideas.</p>
+<textarea id="resp-b3" placeholder="I would rate ... a [1-5] for ... because ..."></textarea>
+<div class="row"><button onclick="saveChallenge('B3','Rate and justify a design choice','resp-b3')">Save my answer</button><span class="save-status" id="status-b3"></span></div></div>
+</section>
+
+<section id="b4"><h2>B4 · Detailed Plans</h2><p class="sub">Detailed plans for the chosen design. <strong>Part 1</strong> shows the form: dimensioned CAD views (a digital design, nothing is fabricated). <strong>Part 2</strong> shows the function: how the robot is connected, how the Python program decides, what the operator sees, and the data the program uses. Someone else should be able to build and code the solution from these plans.</p>
+
+<h3 style="color:var(--navy)">Part 1 · The form (CAD)</h3>
+<div class="fig card"><img src="../img/t08_ortho.png" alt="Dimensioned orthographic views"><figcaption>Dimensioned orthographic views with overall envelope and sensor size, in millimetres.</figcaption></div>
+<div class="fig card"><img src="../img/t08_exploded.png" alt="Exploded view"><figcaption>Exploded view of the chosen design, showing how the parts fit together.</figcaption></div>
+
+<h3 style="color:var(--navy);margin-top:30px">Part 2 · The function</h3>
+<div class="card"><h4 style="margin-top:0;color:var(--navy)">1. System diagram</h4>
+<div class="fig" style="margin:0"><img src="../img/c08_system.svg" alt="System diagram"><figcaption>What is connected to what. Inputs (sensors) send data to the UGOT controller. The Python program sends commands to the outputs.</figcaption></div></div>
+<div class="card" style="margin-top:18px"><h4 style="margin-top:0;color:var(--navy)">2. Flowchart of the program</h4>
+<div class="fig" style="margin:0"><img src="../img/c08_flow.svg" alt="Flowchart" style="max-width:560px"><figcaption>Planned algorithm. <span style="font-weight:700">Rounded box</span> = start or end. <span style="font-weight:700">White box</span> = process. <span style="color:#e8622c;font-weight:700">Diamond</span> = decision, with yes and no exits.</figcaption></div>
+<p><strong>Safety by design (B1 Safety):</strong> the program has a STOP button on the operator screen and fails safe: when a sensor reading is missing or unclear it stops, and it never keeps driving without a valid reading.</p></div>
+<div class="card" style="margin-top:18px"><h4 style="margin-top:0;color:var(--navy)">3. Wireframe of the operator screen</h4>
+<div class="fig" style="margin:0"><img src="../img/c08_wire.svg" alt="Wireframe" style="max-width:640px"><figcaption>Low-fidelity wireframe: layout and function first. Numbers match the table.</figcaption></div>
+<div style="overflow-x:auto"><table><tr><th style="width:6%">#</th><th style="width:30%">Element</th><th>What it does</th></tr>
+<tr><td>1</td><td>Live camera view with plate box</td><td>The main view. Shows live data from the robot so the operator can see what the program sees.</td></tr>
+<tr><td>2</td><td>Plate text label</td><td>Tells the operator what the program is doing now.</td></tr>
+<tr><td>3</td><td>X position bar with 210–430 zone</td><td>Shows a number from the program so the operator can check it against the test pass mark.</td></tr>
+<tr><td>4</td><td>Light state</td><td>Tells the operator what the program is doing now.</td></tr>
+</table></div></div>
+<div style="margin-top:18px;display:grid;grid-template-columns:1fr;gap:18px">
+<div class="card"><h4 style="margin-top:0;color:var(--navy)">4. Pseudocode</h4>
+<pre style="background:#0f2a43;color:#e6eef7;padding:14px 16px;border-radius:10px;overflow-x:auto;font-size:.84rem;line-height:1.5;margin:0">SWITCH TO plate recognition
+LOOP
+  IF target in plate results
+    READ x
+    IF 210 ≤ x ≤ 430: STOP, GREEN
+    ELSE shift towards the middle
+  ELSE flash red and search
+END LOOP</pre>
+<p class="legend">Pseudocode is plain English with the structure of the code. It must match the flowchart step for step.</p></div>
+<div class="card" style="overflow-x:auto"><h4 style="margin-top:0;color:var(--navy)">5. Data and functions the program uses</h4>
+<table><tr><th>Name</th><th>Type</th><th>Value</th><th>Purpose</th></tr></table>
+<table style="margin-top:10px"><tr><th>Function</th><th>What it does</th></tr><tr><td><code>switch_to_plate_recognition()</code></td><td>Kit function: look up the real UGOT name</td></tr><tr><td><code>plate_results()</code></td><td>The list of plate texts the camera recognises.</td></tr><tr><td><code>plate_centre_x()</code></td><td>The X position of the plate centre in the picture (0–640).</td></tr><tr><td><code>stop()</code></td><td>Kit function: look up the real UGOT name</td></tr><tr><td><code>light()</code></td><td>A visual signal that the plate is not found yet.</td></tr><tr><td><code>shift_x()</code></td><td>Moves the car sideways to centre the plate.</td></tr><tr><td><code>rotate_z()</code></td><td>Kit function: look up the real UGOT name</td></tr></table>
+<p class="legend">Function names are planning names that follow the uCode block names. Replace them with the real UGOT Python functions when you code. Sensor facts from the UGOT lesson slides: TOF range 4–200 cm (0 under 4 cm, 200 above 200 cm).</p></div>
+</div>
+<div class="challenge"><h4>🧩 Your turn — plan the function of your own idea</h4>
+<p><strong>All:</strong> draw a flowchart with START, END, three process steps and one decision.<br><strong>Most:</strong> add a wireframe of one operator screen with at least 4 labelled elements, and write the pseudocode to match your flowchart.<br><strong>Some:</strong> add a data table (name, type, value, purpose) and a system diagram for your program.</p>
+<textarea id="resp-b4" placeholder="Describe your flowchart, wireframe and data table here..."></textarea>
+<div class="row"><button onclick="saveChallenge('B4','Flowchart and wireframe your own idea','resp-b4')">Save my answer</button><span class="save-status" id="status-b4"></span></div></div>
+</section>
+
+<section id="integration"><h2>Integration with UGOT</h2><p class="sub">How the chosen design sits on the UGOT robot (a digital CAD reference), plus the humanoid reimagining.</p>
+<div class="fig card"><img src="../img/t08_integration.png" alt="Chosen design on UGOT chassis"><figcaption>“Line-Wing” mounted on a UGOT chassis (simplified reference chassis).</figcaption></div>
+<div class="concept-grid">
+<div class="concept-card card"><img src="../img/ugot_base_isometric.png" alt="UGOT base chassis"><h3>UGOT Base Chassis</h3><div class="tagline">Reference model</div><p>A simplified chassis (body, 4 wheels, camera, controller) so you can check how your design sits on the robot before you code.</p></div>
+<div class="concept-card card"><img src="../img/ugot_humanoid_isometric.png" alt="UGOT Guardian Humanoid"><h3>UGOT Guardian Humanoid</h3><div class="tagline">Wheeled humanoid reimagining</div><p>The wheeled base keeps its mobility while the top half becomes a torso, head and arms. Your Criterion B design can be reinterpreted the same way.</p></div></div>
+<div class="challenge"><h4>🧩 Your turn — Humanoid challenge</h4>
+<p>Give the humanoid foot sensors that follow a line. How would a humanoid that walks keep a straight track?<br><strong>All:</strong> describe one change to the humanoid for this lesson.<br><strong>Most:</strong> sketch in words a second humanoid concept with a different silhouette.<br><strong>Some:</strong> justify it against at least 4 ACCESSFM categories.</p>
+<textarea id="resp-humanoid" placeholder="Type your idea here..."></textarea>
+<div class="row"><button onclick="saveChallenge('humanoid','Humanoid redesign challenge','resp-humanoid')">Save my answer</button><span class="save-status" id="status-humanoid"></span></div></div>
+</section>
+
+<section id="cad"><h2>🛠️ CAD model: video, steps and downloads</h2>
+<p class="sub">Build the chosen design in Tinkercad. Watch the video, follow the steps, then download the STL files and the views. This is <strong>digital CAD only</strong>: nothing is 3D printed or laser cut.</p>
+<style>.cadgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}.vthumb{border:1px solid #d6dee6;border-radius:12px;padding:8px;background:#fff;text-align:center;text-decoration:none;color:#0f2a43;font-weight:700;font-size:.9rem}.vthumb img{width:100%;height:130px;object-fit:contain;background:#f1f5f9;border-radius:8px}.vthumb small{display:block;font-weight:400;color:#5b6b7a}.vthumb:hover{border-color:#e8622c}.cadsteps li{margin:3px 0}.cadvid{width:100%;max-width:760px;border-radius:12px;background:#000}</style>
+<h3 style="color:var(--navy)">1 · Tinkercad tutorial video</h3>
+<video class="cadvid" controls preload="metadata" poster="../videos/t08.jpg"><source src="../videos/t08.mp4" type="video/mp4">Your browser cannot play this video. <a href="../videos/t08.mp4">Download it</a>.</video>
+<h3 style="color:var(--navy)">2 · Steps for making the CAD model</h3>
+<div class="card"><p style="margin-top:0">The picture-by-picture guide has the exact numbers for every shape, a tick box for each step and a skills quiz (scores are saved to the class sheet).</p><ol class="cadsteps"><li>Mounting plate</li><li>Sensitivity knob</li><li>Wing strut ×2</li><li>Wing bar ×2</li><li>Skid pad ×2</li><li>Line sensor ×7</li><li>Compare with the teacher's model</li><li>Capture the three views</li><li>Add the dimensions</li><li>Save and export</li></ol>
+<p style="margin-bottom:0"><a class="dlbtn" style="display:inline-block;max-width:380px" href="../guides/tinkercad-08.html">Open the full Tinkercad guide →</a></p></div>
+<h3 style="color:var(--navy)">3 · STL files</h3>
+<p class="sub">Open <a href="https://www.tinkercad.com/" target="_blank" rel="noopener">tinkercad.com</a> → Create new 3D design → <strong>Import</strong> → choose the <code>.stl</code> → units <strong>mm</strong>. Measure, recolour or combine it, then Export when you finish.</p>
+<div class="download-grid"><a class="dlbtn" href="../stl/UGOT_T08_CHOSEN_Line-Wing_FINAL.stl" download>Chosen design STL<small>Line Wing</small></a><a class="dlbtn" href="../stl/UGOT_T08_Concept1_Line-Wing.stl" download>Concept 1 STL<small>Line Wing</small></a><a class="dlbtn" href="../stl/UGOT_T08_Concept2_Tag-Frame.stl" download>Concept 2 STL<small>Tag Frame</small></a><a class="dlbtn" href="../stl/UGOT_T08_Concept3_Trace-Pointer.stl" download>Concept 3 STL<small>Trace Pointer</small></a><a class="dlbtn" href="../stl/UGOT_T08_CHOSEN_Line-Wing_EXPLODED_reference.stl" download>Exploded-position STL<small>Reference only</small></a><a class="dlbtn" href="../stl/UGOT_BaseChassis.stl" download style="background:var(--blue)">UGOT base chassis STL<small>Test-fit your design</small></a><a class="dlbtn" href="../stl/UGOT_HUMANOID.stl" download style="background:var(--blue)">Guardian Humanoid STL<small>Wheeled base + torso + arms</small></a></div>
+<h3 style="color:var(--navy)">4 · Views (click to download)</h3>
+<div class="cadgrid"><a class="vthumb" href="../img/t08_ortho.png" download><img src="../img/t08_ortho.png" alt="Orthographic sheet" loading="lazy">Orthographic sheet<small>Front, top and side · PNG download</small></a><a class="vthumb" href="../img/t08_ca_iso.png" download><img src="../img/t08_ca_iso.png" alt="Idea 1 isometric" loading="lazy">Idea 1 isometric<small>Concept 1 · PNG download</small></a><a class="vthumb" href="../img/t08_cb_iso.png" download><img src="../img/t08_cb_iso.png" alt="Idea 2 isometric" loading="lazy">Idea 2 isometric<small>Concept 2 · PNG download</small></a><a class="vthumb" href="../img/t08_cc_iso.png" download><img src="../img/t08_cc_iso.png" alt="Idea 3 isometric" loading="lazy">Idea 3 isometric<small>Concept 3 · PNG download</small></a><a class="vthumb" href="../img/t08_exploded.png" download><img src="../img/t08_exploded.png" alt="Exploded view" loading="lazy">Exploded view<small>Parts and order · PNG download</small></a><a class="vthumb" href="../img/t08_integration.png" download><img src="../img/t08_integration.png" alt="Integration view" loading="lazy">Integration view<small>On the UGOT robot · PNG download</small></a></div>
+<p style="margin-top:14px"><a class="dlbtn" style="display:inline-block;max-width:420px" href="../downloads/UGOT_T08_CAD_pack.zip" download>⬇ Download everything for this lesson (.zip)<small>All STL files, all views, and the steps list</small></a></p>
+</section>
+
+<section id="build"><h2>Build and test the robot</h2><p class="sub">No 3D printing or laser cutting. Use the ready UGOT kit, write the program in Python and test it against your B1 specification.</p>
+<div class="card"><ol class="steps"><li><strong>Check the kit:</strong> UGOT mecanum car, camera, printed plates, laptop. Tell your teacher about any missing part now.</li><li><strong>Confirm your B3 design:</strong> the kit parts stand in for the “Line-Wing” sketch (seven-sensor swept wing). The part you design is the <em>program</em>.</li><li><strong>Assemble</strong> with the kit's own instructions, then photograph the finished robot.</li><li><strong>Connect</strong> the laptop to the UGOT and run a short program: print the licence plate text the camera sees.</li><li><strong>Function-test</strong> against the B1 function criteria: Follows a 20 mm wide line at 0.15 m/s with fewer than 2 line losses per lap. Record results in your portfolio.</li><li><strong>Carry on to Criterion C</strong> to plan, code, log and justify your changes.</li></ol>
+<p style="margin-top:14px"><a class="dlbtn" style="display:inline-block;max-width:380px" href="criteria-c-08.html">Open Criterion C for this topic →</a></p></div></section>
+
+<section id="quiz"><h2>Quiz — Tracking and Tracing</h2><p class="sub">Kahoot-style, timed, auto-marked. Your score is saved once you log in above.</p>
+<div class="quiz-card" id="quizCard">
+<div class="quiz-start" id="quizStart"><h3 style="margin-top:0;">🏁 Ready to play?</h3><p style="color:var(--muted);">10 questions · 15 seconds each · lesson content + Criterion B skills.</p><button onclick="startQuiz()">Start Quiz</button></div>
+<div id="quizPlay" style="display:none;"><div class="quiz-head"><div class="qnum" id="qnum" style="color:#e8e8ff;">QUESTION 1</div><h3 class="qtext" id="qtext" style="color:#fff;">...</h3><div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div></div>
+<div class="quiz-body"><div class="opt-grid" id="optGrid"></div></div>
+<div class="quiz-foot"><span>Score: <span class="score-pill" id="scorePill">0</span></span><span id="feedbackMsg"></span></div></div>
+<div class="quiz-result" id="quizResult" style="display:none;"><h3 style="margin-top:0;">🎉 Quiz complete!</h3><p style="font-size:1.4rem;font-weight:800;color:var(--navy);" id="finalScore">0 / 10</p><p id="submitStatus" class="save-status"></p><button onclick="startQuiz()">Play again</button><div class="lb-table" id="leaderboard"></div></div>
+</div></section>
+
+<section><h2>Reflection prompts</h2><div class="card"><ul>
+<li>Which ACCESSFM category was hardest to satisfy with all three of <em>your</em> ideas, and why?</li>
+<li>How did sensor range, reach or print time change once you saw the dimensioned drawings?</li>
+<li>Where might your chosen design still fail Safety in real use, and how would you test for it?</li></ul></div></section>
+
+<div class="pager"><a href="topic-07.html">← Topic 07: Automatic Patrol</a>
+<a href="topic-09.html">Topic 09: Colour Detective →</a></div>
+</div>
+<aside class="ref-side"><img src="../img/ugot_models_reference.png" alt="Stock UGOT builds"><div class="cap">Stock UGOT builds. Your design bolts onto any of these.</div>
+<img src="../img/t08_integration.png" alt="This lesson's design on the chassis"><div class="cap">This lesson's chosen design on the chassis</div></aside>
+</div><section id="portfolio-root" data-criterion="B" data-topic="08" data-base="../"></section>
+</main>
+<footer><p>AIA Grade 10 Digital Design &amp; IB MYP Computer Science · UGOT AI Robotics: Designing Autonomous Vehicles for Safer Communities</p>
+<p>Models are student-style exemplars. Sensor ranges are design targets: always verify against the UGOT datasheet.</p></footer>
+<script src="../assets/config.js"></script>
+<script>window.LESSON = { name: "Topic 08 - Tracking and Tracing", quiz: [{"q": "High contrast (black line on white) helps because…", "opts": ["the sensor can tell line from floor", "it uses a lot less battery power", "the robot can drive much faster on it", "it protects the drive motors better"], "correct": 0, "why": "A bigger brightness difference makes the reading clearer."}, {"q": "A decision matrix is useful because it…", "opts": ["draws the final model for you", "lists all the parts and their prices", "tests which material is the strongest", "scores each idea against the criteria"], "correct": 3, "why": "A table of scores makes the comparison fair and visible."}, {"q": "The orthographic sheet shows which three views?", "opts": ["Front, back and underneath", "Top view drawn three times", "Front, top and right side", "Left, right and rear only"], "correct": 2, "why": "Front, top and right side give width, depth and height."}, {"q": "What does a tag camera read?", "opts": ["The temperature of the floor surface", "The battery voltage in the robot", "Printed tags or markers", "Sound coming from nearby robots"], "correct": 2, "why": "A tag camera recognises printed markers such as QR-style tags."}, {"q": "Which design loses curves most easily?", "opts": ["Line-Wing, with its many sensors", "Any design that also has encoders", "Tag-Reader, which uses a camera", "Trace-Pointer (one sensor)"], "correct": 3, "why": "One sensor only knows 'on' or 'off' the line, not which way it bends."}, {"q": "Why build a prototype?", "opts": ["To skip the evaluation stage later", "To test an idea before the final version", "To avoid having to draw any plans", "To reduce the total number of parts"], "correct": 1, "why": "Prototypes reveal problems while they are cheap to fix."}, {"q": "Why keep sensors flush with the shell?", "opts": ["It makes them hear better", "It lowers motor temperature", "Bumps cannot snap them off", "It changes the colour reading"], "correct": 2, "why": "Sensors that stick out are the first thing to be hit."}, {"q": "Why make quick sketches before CAD?", "opts": ["CAD software cannot draw any curves", "Ideas are cheap to change on paper", "Sketches replace the need for plans", "Sketches are always sent to the printer"], "correct": 1, "why": "Early sketches let you explore many ideas fast."}, {"q": "Why use several line sensors instead of one?", "opts": ["It saves filament overall", "It reduces motor current", "It spots curves earlier", "It makes the robot quieter"], "correct": 2, "why": "With more sensors the robot sees which way the line bends before it leaves it."}, {"q": "What does a flowchart show?", "opts": ["The steps and decisions of a program in order", "The materials a part is made of", "The cost of each part", "The weight of the robot"], "correct": 0, "why": "A flowchart shows the order of steps and the decisions, so someone else can code the program."}] };</script>
+<script src="../assets/site.js"></script><script src="../assets/topics.js"></script><script src="../assets/portfolio.js"></script>
+</body></html>
