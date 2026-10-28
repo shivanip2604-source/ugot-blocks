@@ -2,6 +2,7 @@
 
 ## Your links
 - Website for students: https://shivanip2604-source.github.io/ugot-blocks/
+- Playground (free coding): https://shivanip2604-source.github.io/ugot-blocks/playground.html
 - Block Guide: https://shivanip2604-source.github.io/ugot-blocks/guide.html
 - The files (GitHub): https://github.com/shivanip2604-source/ugot-blocks
 - Turn the website on or off: https://github.com/shivanip2604-source/ugot-blocks/settings/pages
@@ -18,6 +19,14 @@ The website is free and has no time limit. It keeps working while the repository
 Buttons in step 4: "Put the sample back" (if they break it) and "Start with empty blocks" (to rebuild it themselves from the flowchart).
 
 Some goals need a different **Test setting** (under the arena). The goal says which one, for example "(test setting: Block on the line)".
+
+## Playground (free coding)
+Like VEXcode VR: code on the left, robot world on the right, and a live sensor dashboard underneath.
+- **World** (top left): Everything (start here), Open field, Wall maze (spiral), Line track, Colour grid, AI camera room.
+- **Start from an example**: 9 programs, one for each part (motors, distance, colour, mecanum slide, line, face, objects, signs, maze). Each one switches to the right world.
+- **Live drive**: drive with W A S D Q E or the on-screen buttons. Pick a camera mode (face, object, sign, person, line) and watch the dashboard change.
+- The AI camera blocks need a mode first: the **ai mode** block (Robot group). If a student forgets, Robot messages tells them.
+- Drag boxes, people, signs and objects to new places, then run again.
 
 ## Missions
 - Starter: Free Drive, Drive a Square, Climb the Step

@@ -9,7 +9,7 @@ let G=null,O=null,common=false;
 const COL={move:"#1f6fe5",sense:"#0e9aa7",act:"#f26a21",wait:"#c98a00",loops:"#5ba55b",logic:"#5b80a5",math:"#5b67a5",text:"#5ba58c",lists:"#745ba5",vars:"#a55b80",py:"#6b7785"};
 
 /* ---------- robot functions -> block specs ---------- */
-const TEXTY=/^(name|colour|color|text|note|kind|joint|label|message)$/;
+const TEXTY=/^(name|colour|color|text|note|kind|joint|label|message|mode)$/;
 const NUM_DEF={speed:30,seconds:1,angle:45,deg:90,mm:100,position:100};
 const VAL_D=/^(True\b|Which|Where|Height|Colou?r|Name of|Tilt|List|X position|Odometry|The most likely|Wait for the next|Distance|Wheel encoder|TOF distance)/;
 const VAL_N=/^(tof_|read_|gyro_|loudness|sound_direction|best_match|tag_|lane_offset|monorail_offset|plate_|person_visible|scan_code|odometer|button_pressed|body_y|face_recognised|recognised|sign_recognised|heading$|position$)/;

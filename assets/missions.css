@@ -92,3 +92,12 @@ body{font-size:16px}
 .changes b{font-weight:700}
 .changes span{color:var(--ink)}
 .changes small{display:block;color:var(--muted);font-size:.92rem;margin-top:2px}
+/* site tabs */
+.tabsnav{display:flex;flex-wrap:wrap;gap:4px}
+.tabsnav a{color:#cfe0f2;text-decoration:none;font-weight:700;font-size:.95rem;padding:7px 14px;border-radius:9px}
+.tabsnav a:hover{background:var(--navy2);color:#fff}
+.tabsnav a[aria-current="page"]{background:var(--accent);color:#fff}
+.tabsnav a:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.kbar{flex-wrap:wrap}
+.pgcall{flex-direction:row;align-items:center;gap:14px;margin:0 0 6px;border-left:6px solid var(--accent)}
+.pgcall>span:last-child{display:flex;flex-direction:column;gap:2px}

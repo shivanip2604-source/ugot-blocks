@@ -8,6 +8,8 @@ Robot missions for complete beginners (built for Grade 8). Every mission is spoo
 4. **Run it**: the sample program is already loaded next to a virtual UGOT robot. Press Run and watch the goals get ticked.
 5. **Try these changes**: 3 or 4 small edits (change one number or word), each with what to watch for.
 
+The **Playground** (`playground.html`) is free coding in the style of VEXcode VR: blocks or Python on the left, the robot world on the right, a live sensor dashboard (distance, colour, heading, position, AI camera, line, motors, servo, light, screen), Live drive with camera-mode buttons, 6 worlds (Everything, Open field, Wall maze, Line track, Colour grid, AI camera room) and 9 example programs. Its robot is defined in `sim/tplay.js`.
+
 The **Block Guide** (`guide.html`) explains every block with a tiny program and a "Try it in Free Drive" button.
 
 Live site: https://shivanip2604-source.github.io/ugot-blocks/
@@ -18,7 +20,7 @@ Explorer: Colour Sorter, Parcel Sorter, Find the Clap, Line Patrol, Safe Driving
 Expert: Spot the Bottle, Find Amira, Plate Tracker, Parcel Delivery, Rescue Mission.
 
 ## Files
-- `index.html`: mission picker. `mission.html?topic=NN`: one mission. `guide.html`: the Block Guide.
+- `index.html`: mission picker. `mission.html?topic=NN`: one mission. `playground.html`: free coding. `guide.html`: the Block Guide.
 - `assets/missions.js`: mission text, sensors, flowcharts (which also make the sample programs), changes to try and goal names. Edit this file to change what students read.
 - `assets/guide.js`: Block Guide entries and their sample programs.
 - `assets/blocks.js`: the Blocks / Python editor. The blocks write Python, which the simulator runs. Robot blocks are made automatically from each topic's functions.

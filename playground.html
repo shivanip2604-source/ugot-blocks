@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playground · UGOT Simulator</title>
+<link rel="stylesheet" href="sim/sim.css"><link rel="stylesheet" href="assets/missions.css">
+<style>
+/* Layout: toolbar on top, code on the left, robot world + live sensor dashboard on the right (like VEXcode VR). */
+.pgbar{background:var(--panel);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.pgbar .grow{flex:1 1 auto}
+.pgbar label{font-size:.88rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+#controls{margin:0;flex-direction:row}
+#controls label{font-weight:700;color:var(--ink)}
+.pg{max-width:1600px;margin:0 auto;padding:14px max(16px,env(safe-area-inset-right,0px)) 30px max(16px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1000px){.pg{grid-template-columns:minmax(0,1fr)}}
+.pg .ub-ws{height:calc(100vh - 300px);min-height:460px}
+.pg .editor{height:calc(100vh - 300px);min-height:460px}
+.dash h2,.pg-code h2{display:flex;justify-content:space-between;align-items:center}
+.dash .hud{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));margin-top:0}
+.dash .hud div{border-left:4px solid var(--accent)}
+.dash .hud b{font-size:.98rem}
+.livebox{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.livebox .note{max-width:44ch}
+.start-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px}
+.start-row select{flex:1 1 260px}
+.sim-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (min-width:1001px){.sim-col{position:sticky;top:10px}}
+</style></head><body>
+<header class="kbar"><a class="brand" href="index.html">🤖 UGOT Simulator</a>
+ <nav class="tabsnav" aria-label="Site"><a href="index.html">🚀 Missions</a><a href="playground.html" aria-current="page">🧪 Playground</a><a href="guide.html">🧩 Block Guide</a></nav></header>
+<div class="pgbar">
+ <div class="ctrl" id="controls"></div>
+ <button class="btn run go" id="runBtn" disabled>▶ Run</button>
+ <button class="btn alt" id="playBtn" disabled>⏯ Pause / replay</button>
+ <button class="btn alt" id="resetBtn">↺ Reset</button>
+ <button class="btn alt" id="liveBtn">🎮 Live drive</button>
+ <label for="speedSel">Speed <select id="speedSel"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+ <button class="btn alt sm" id="soundBtn" aria-pressed="true">🔊 Sound on</button>
+ <span class="grow"></span><span class="status" id="pystatus">Loading Python…</span>
+</div>
+<main class="pg">
+ <section class="panel pg-code">
+  <h2>Your program</h2>
+  <div class="start-row"><label class="note" for="example">Start from an example:</label><select id="example"></select></div>
+  <div class="editor"><pre class="gutter" id="gutter"></pre><textarea id="code" class="code" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Python code editor"></textarea></div>
+  <p class="note" style="margin:10px 0 0">Every block is explained in the <a href="guide.html">Block Guide</a>. The AI camera blocks need a mode first: use <b>ai mode</b> from Robot (face, object, sign, person or line).</p>
+ </section>
+ <div class="sim-col">
+  <section class="panel"><h2>Robot world <span id="liveTag"></span></h2>
+   <canvas id="arena" width="900" height="600" aria-label="Top-down view of the playground with the UGOT robot"></canvas>
+   <input id="scrub" type="range" min="0" max="0" value="0" step="1" style="margin-top:8px" aria-label="Playback position">
+   <p class="note" style="margin:6px 0 0">Drag boxes, people, signs and objects to move them, then run again.</p>
+   <div id="livePanel" style="display:none;margin-top:10px"><div class="livebox"><div class="pad" id="pad"><button data-k="q" aria-label="Turn left">⟲</button><button data-k="w" aria-label="Forward">▲</button><button data-k="e" aria-label="Turn right">⟳</button><button data-k="a" aria-label="Slide left">◀</button><button data-k="s" aria-label="Back">▼</button><button data-k="d" aria-label="Slide right">▶</button></div>
+    <div><label class="note">Drive speed <input id="liveSpeed" type="range" min="10" max="100" value="40" style="width:120px"></label><p class="note" id="keyhelp" style="margin:6px 0 0"></p><div class="row" id="liveButtons"></div>
+    <p class="note" style="margin:6px 0 0">Camera mode buttons above: pick one, then drive and watch the sensor dashboard change.</p></div></div></div>
+  </section>
+  <section class="panel dash"><h2>Sensor dashboard <span class="note" style="text-transform:none;letter-spacing:0;font-weight:600">live</span></h2><div class="hud" id="hud"></div></section>
+  <section class="panel"><h2>Robot messages</h2><div class="console" id="console" role="log"></div>
+   <div class="score" id="score" style="margin:10px 0 6px"></div><ul class="checks" id="checks"></ul></section>
+  <details class="panel more"><summary>More: sensor noise, distance graph, every Python function</summary><div>
+   <h3>Settings</h3><div class="ctrl" id="moreControls" style="flex-direction:column;align-items:flex-start;margin-top:0"></div>
+   <div class="twin" style="margin-top:12px"><div hidden><h3 id="insetTitle">Close-up</h3><canvas id="inset" width="600" height="400"></canvas></div><div><h3>Distance graph</h3><canvas id="chart" width="600" height="400"></canvas></div></div>
+   <h3>Every Python function</h3><div class="scroll"><table class="api" id="apiTable"></table></div>
+   <div class="row" style="margin-top:10px"><label class="note" for="vol">Volume</label><input id="vol" type="range" min="0" max="100" value="60" style="width:100px"><label class="note"><input type="checkbox" id="voice" checked> Voice</label>
+    <button class="btn alt sm" id="copyBtn" disabled>Copy results</button><span class="status" id="copyStatus"></span><button class="btn alt sm" id="replBtn" disabled hidden>Run on current state</button></div>
+   <div hidden><span id="title"></span><span id="tagline"></span><span id="links"></span><div id="brief"></div></div>
+  </div></details>
+ </div>
+</main>
+<script src="sim/engine.js"></script><script src="sim/tplay.js"></script>
+<script src="assets/blockly/blockly_compressed.js"></script><script src="assets/blockly/blocks_compressed.js"></script><script src="assets/blockly/python_compressed.js"></script><script src="assets/blockly/msg/en.js"></script>
+<script src="assets/blocks.js"></script>
+<script>
+(function(){
+ var $=function(x){return document.getElementById(x)};
+ UGOT.topics.play.chart={series:[{label:"Distance (cm)",get:function(s){return s.st.dash.tof}}],ymax:200,unit:"cm"};
+ UGOT.mount("play");document.title="Playground · UGOT Simulator";
+ // World picker in the toolbar; noise switch under More.
+ var ctl=$("controls").children;while(ctl.length>1)$("moreControls").appendChild(ctl[1]);
+ var T=UGOT._state().T;
+ var inst=window.UBlocks&&UBlocks.attach({textarea:"code",api:T.api,helpers:true,sleep:"global",mode:"blocks",
+  examples:Object.keys(T.examples).map(function(k){return T.examples[k].code}).join("\n"),
+  getPy:function(){return new Promise(function(res,rej){UGOT.loadPyodideOnce(res,rej)})},onCode:UGOT.syncGutter});
+ window.UGOT_BLOCKS=inst;
+ // Plain words for the run summary.
+ new MutationObserver(function(){var st=document.querySelector("#score strong");if(st&&/Free play/.test(st.textContent)){st.textContent="What happened";var n=document.querySelector("#score .note");if(n)n.textContent=""}})
+  .observe($("score"),{childList:true,subtree:true});
+})();
+</script></body></html>
